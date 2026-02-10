@@ -1,83 +1,100 @@
-(() => {
-  const cfg = window.SUPABASE_CONFIG;
+/* Suhaib Store - Public page */
 
-  document.getElementById("brandName").textContent = cfg.brandName;
-  document.getElementById("brandName2").textContent = cfg.brandName;
-  document.getElementById("year").textContent = new Date().getFullYear();
+const { createClient } = supabase;
+const supa = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
 
-  const waLink = `https://wa.me/${cfg.whatsappNumber}`;
-  document.getElementById("btnWhatsApp").href = waLink;
-  document.getElementById("btnInstagram").href = cfg.instagramUrl;
+// عدّل روابط التواصل هون فقط (بدون ما تلمس أي شي ثاني)
+const WHATSAPP_LINK = "https://wa.me/XXXXXXXXXXX";
+const INSTAGRAM_LINK = "https://instagram.com/USERNAME";
 
-  const client = supabase.createClient(cfg.url, cfg.anonKey);
+document.getElementById("whatsBtn").href = WHATSAPP_LINK;
+document.getElementById("instaBtn").href = INSTAGRAM_LINK;
 
-  const grid = document.getElementById("grid");
-  const q = document.getElementById("q");
-  const filterFeatured = document.getElementById("filterFeatured");
+const productsEl = document.getElementById("products");
+const searchInput = document.getElementById("searchInput");
+const filterSelect = document.getElementById("filterSelect");
 
-  let all = [];
+let allProducts = [];
 
-  function money(p, c){
-    if (p === null || p === undefined || p === "") return "";
-    const n = Number(p);
-    if (Number.isNaN(n)) return "";
-    return `${c || "USD"} ${n.toFixed(2)}`;
+function safeText(v){ return (v ?? "").toString(); }
+
+function formatPrice(p, currency){
+  if (p === null || p === undefined || p === "") return "";
+  const cur = currency || "USD";
+  return `${cur} ${Number(p).toFixed(2)}`;
+}
+
+function getPublicImageUrl(image_path){
+  if (!image_path) return "";
+  // bucket لازم اسمه product-images
+  const { data } = supa.storage.from("product-images").getPublicUrl(image_path);
+  return data?.publicUrl || "";
+}
+
+function render(list){
+  productsEl.innerHTML = "";
+
+  if (!list.length){
+    productsEl.innerHTML = `<div style="opacity:.7;padding:10px">لا يوجد منتجات حالياً</div>`;
+    return;
   }
 
-  function imgUrl(path){
-    if (!path) return "logo.png";
-    const { data } = client.storage.from(cfg.bucket).getPublicUrl(path);
-    return data.publicUrl || "logo.png";
-  }
+  for (const p of list){
+    const imgUrl = getPublicImageUrl(p.image_path);
 
-  function render(){
-    const term = (q.value || "").trim().toLowerCase();
-    const onlyFeat = filterFeatured.value === "featured";
+    const card = document.createElement("div");
+    card.className = "product-card";
 
-    const list = all.filter(x => {
-      const okFeat = !onlyFeat || !!x.featured;
-      const okTerm = !term || (x.title||"").toLowerCase().includes(term) || (x.description||"").toLowerCase().includes(term);
-      return okFeat && okTerm;
-    });
-
-    grid.innerHTML = list.map(p => `
-      <div class="card">
-        <img src="${imgUrl(p.image_path)}" alt="">
-        <div class="content">
-          <div class="titleRow">
-            <h3>${p.title || ""}</h3>
-            <div class="price">${money(p.price, p.currency)}</div>
-          </div>
-          <div class="desc">${p.description || "—"}</div>
-          ${p.featured ? `<div class="pill">⭐ Featured</div>` : ``}
-          <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-            <a class="btn primary" target="_blank" rel="noopener"
-               href="${waLink}?text=${encodeURIComponent("مرحباً، بدي أطلب: " + (p.title||""))}">
-              اطلب على واتساب
-            </a>
-            <a class="btn" target="_blank" rel="noopener" href="${cfg.instagramUrl}">اطلب على انستغرام</a>
-          </div>
-        </div>
+    card.innerHTML = `
+      <div class="thumb">
+        ${imgUrl ? `<img src="${imgUrl}" alt="${safeText(p.title)}" loading="lazy">` : ``}
       </div>
-    `).join("");
+      <div class="card-body">
+        ${p.featured ? `<div class="badge">⭐ Featured</div>` : ``}
+        <h3 class="title">${safeText(p.title)}</h3>
+        <p class="desc">${safeText(p.description)}</p>
+        <div class="price">${formatPrice(p.price, p.currency)}</div>
+      </div>
+    `;
+
+    productsEl.appendChild(card);
+  }
+}
+
+function applyFilters(){
+  const q = safeText(searchInput.value).trim().toLowerCase();
+  const mode = filterSelect.value;
+
+  let list = allProducts.slice();
+
+  if (mode === "featured") list = list.filter(x => !!x.featured);
+
+  if (q){
+    list = list.filter(x =>
+      safeText(x.title).toLowerCase().includes(q) ||
+      safeText(x.description).toLowerCase().includes(q)
+    );
   }
 
-  async function load(){
-    const { data, error } = await client
-      .from("products")
-      .select("*")
-      .order("created_at", { ascending: false });
+  render(list);
+}
 
-    if (error) {
-      grid.innerHTML = `<div class="small">خطأ تحميل المنتجات: ${error.message}</div>`;
-      return;
-    }
-    all = data || [];
-    render();
+async function load(){
+  const { data, error } = await supa
+    .from("products")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error){
+    productsEl.innerHTML = `<div style="color:#ffb4b4;padding:10px">خطأ: ${safeText(error.message)}</div>`;
+    return;
   }
 
-  q.addEventListener("input", render);
-  filterFeatured.addEventListener("change", render);
+  allProducts = data || [];
+  applyFilters();
+}
 
-  load();
-})();
+searchInput.addEventListener("input", applyFilters);
+filterSelect.addEventListener("change", applyFilters);
+
+load();
