@@ -1,6 +1,6 @@
-// Supabase config (عدّلها من: Project Settings -> API)
+// Supabase configuration (جاهز)
 window.SUPABASE_CONFIG = {
-  url: "PASTE_SUPABASE_URL_HERE",
-  anonKey: "PASTE_SUPABASE_ANON_KEY_HERE",
+  url: "https://ziozomnceumhdwzccwke.supabase.co",
+  anonKey: "PASTE_ANON_PUBLIC_KEY_HERE",
   storageBucket: "product-images"
 };
