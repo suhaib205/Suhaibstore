@@ -13,7 +13,7 @@
         <img src="logo.png" alt="logo" />
         <div>
           <h1>Admin</h1>
-          <div class="badge">إضافة/تعديل المنتجات</div>
+          <div class="badge">الدخول مطلوب • إضافة/حذف منتجات</div>
         </div>
       </div>
       <div class="actions">
@@ -27,11 +27,11 @@
         <h2 style="margin:0 0 8px 0">تسجيل الدخول</h2>
         <div class="row">
           <div>
-            <label>الإيميل</label>
+            <div class="small">الإيميل</div>
             <input class="input" id="email" placeholder="email@example.com" />
           </div>
           <div>
-            <label>كلمة المرور</label>
+            <div class="small">كلمة المرور</div>
             <input class="input" id="password" type="password" placeholder="********" />
           </div>
         </div>
@@ -43,35 +43,36 @@
 
       <div id="adminPanel" class="panel" style="display:none;margin-top:14px">
         <h2 style="margin:0 0 8px 0">إضافة منتج</h2>
+
         <div class="row">
           <div>
-            <label>اسم المنتج</label>
+            <div class="small">اسم المنتج</div>
             <input class="input" id="title" placeholder="ChatGPT Plus..." />
           </div>
           <div>
-            <label>السعر</label>
+            <div class="small">السعر</div>
             <input class="input" id="price" type="number" step="0.01" placeholder="15" />
           </div>
         </div>
 
-        <div class="row">
+        <div class="row" style="margin-top:10px">
           <div>
-            <label>العملة</label>
+            <div class="small">العملة</div>
             <input class="input" id="currency" value="USD" />
           </div>
           <div>
-            <label>Featured</label>
-            <select id="featured">
+            <div class="small">Featured</div>
+            <select class="input" id="featured">
               <option value="false">No</option>
               <option value="true">Yes</option>
             </select>
           </div>
         </div>
 
-        <label>وصف (اختياري)</label>
+        <div style="margin-top:10px" class="small">وصف (اختياري)</div>
         <textarea class="input" id="description" rows="3" placeholder="تفاصيل المنتج..."></textarea>
 
-        <label>صورة المنتج</label>
+        <div style="margin-top:10px" class="small">صورة المنتج</div>
         <input class="input" id="image" type="file" accept="image/*" />
 
         <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
