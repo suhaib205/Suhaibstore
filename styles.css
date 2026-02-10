@@ -198,3 +198,60 @@ header p{
   margin-top: 26px;
   font-size: 12px;
 }
+/* =========================
+   Admin page fixes (ONLY admin)
+   ========================= */
+
+body.admin-page {
+  /* امنع أي صورة/خلفية كبيرة من صفحة المتجر */
+  background: #0b1220 !important;
+  overflow-x: hidden;
+}
+
+/* اخفِ أي هيرو/بانر/صورة كبيرة إذا كانت نفس كلاس الصفحة الرئيسية */
+body.admin-page .hero,
+body.admin-page .banner,
+body.admin-page .header-hero,
+body.admin-page .top-hero,
+body.admin-page .cover,
+body.admin-page .cover-img,
+body.admin-page .store-hero {
+  display: none !important;
+}
+
+/* لو في صورة عامة داخل أول الصفحة */
+body.admin-page img.hero,
+body.admin-page img.banner,
+body.admin-page .hero img,
+body.admin-page .banner img {
+  display: none !important;
+}
+
+/* خلّي محتوى الادمن طبيعي ومقروء */
+body.admin-page main,
+body.admin-page .container,
+body.admin-page .admin-container {
+  width: 100% !important;
+  max-width: 980px;
+  margin: 0 auto !important;
+  padding: 24px 16px !important;
+}
+
+/* لو الفورم/الكارد صغير */
+body.admin-page form,
+body.admin-page .card,
+body.admin-page .panel,
+body.admin-page .admin-card {
+  width: 100% !important;
+  max-width: 520px;
+  margin: 0 auto !important;
+}
+
+/* تحسين شكل مدخلات الادمن */
+body.admin-page input,
+body.admin-page select,
+body.admin-page textarea,
+body.admin-page button {
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
