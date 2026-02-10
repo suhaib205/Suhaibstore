@@ -8,13 +8,14 @@
   <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
+
 <header>
   <div class="wrap topbar">
     <a class="brand" href="./">
       <img src="logo.png" alt="Logo"/>
       <div>
         <div class="name" id="storeName">Suhaib Store</div>
-        <div class="hint" id="tagline">Digital products — order via WhatsApp</div>
+        <div class="hint" id="tagline">منتجات رقمية — اطلب عبر واتساب</div>
       </div>
     </a>
 
@@ -22,27 +23,61 @@
       <input id="search" placeholder="ابحث عن منتج..."/>
       <select id="category"><option value="all">كل التصنيفات</option></select>
       <button id="langBtn">English</button>
-      <a href="admin.html" class="hint">Admin</a>
+      <a class="btn btn-ghost" href="admin.html">Admin</a>
     </div>
   </div>
 </header>
 
+<section class="wrap hero">
+  <div class="hero-inner">
+    <div>
+      <h1 id="heroTitle">متجر احترافي لمنتجاتك الرقمية</h1>
+      <p id="heroDesc">اختر المنتج… ثم اطلب مباشرة عبر واتساب أو تواصل إنستغرام.</p>
+      <div class="status" id="status">Loading...</div>
+    </div>
+    <div class="hero-actions">
+      <a class="btn btn-primary" id="waTop" target="_blank" rel="noreferrer">WhatsApp</a>
+      <a class="btn" id="igTop" target="_blank" rel="noreferrer">Instagram</a>
+    </div>
+  </div>
+</section>
+
 <main class="wrap">
-  <div class="hint" id="status">Loading...</div>
-  <div style="height:10px"></div>
   <div id="list" class="grid"></div>
-  <div class="hint" id="empty" style="display:none;">لا يوجد منتجات بعد.</div>
+  <div class="status" id="empty" style="display:none;">لا يوجد منتجات بعد.</div>
 </main>
 
-<footer class="wrap hint">
+<footer class="wrap">
   © <span id="year"></span> <span id="storeName2">Suhaib Store</span>
 </footer>
 
+<!-- Product modal -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-top">
+      <div class="modal-title" id="mTitle">—</div>
+      <button class="modal-close" id="mClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <img class="modal-img" id="mImg" alt=""/>
+      <div class="modal-info">
+        <div class="chips" id="mChips"></div>
+        <div class="price" id="mPrice"></div>
+        <div class="desc" id="mDesc"></div>
+        <div class="modal-actions">
+          <a class="btn btn-primary" id="mWA" target="_blank" rel="noreferrer">WhatsApp</a>
+          <a class="btn" id="mIG" target="_blank" rel="noreferrer">Instagram</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Supabase JS (CDN) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script src="store-config.js"></script>
 <script src="supabase-config.js"></script>
 <script src="app.js"></script>
+
 </body>
 </html>
