@@ -1,13 +1,13 @@
 (() => {
   const cfg = window.SUPABASE_CONFIG;
+
   document.getElementById("brandName").textContent = cfg.brandName;
+  document.getElementById("brandName2").textContent = cfg.brandName;
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  const wa = document.getElementById("btnWhatsApp");
-  const ig = document.getElementById("btnInstagram");
   const waLink = `https://wa.me/${cfg.whatsappNumber}`;
-  wa.href = waLink;
-  ig.href = cfg.instagramUrl;
+  document.getElementById("btnWhatsApp").href = waLink;
+  document.getElementById("btnInstagram").href = cfg.instagramUrl;
 
   const client = supabase.createClient(cfg.url, cfg.anonKey);
 
@@ -19,13 +19,15 @@
 
   function money(p, c){
     if (p === null || p === undefined || p === "") return "";
-    return `${c || "USD"} ${Number(p).toFixed(2)}`;
+    const n = Number(p);
+    if (Number.isNaN(n)) return "";
+    return `${c || "USD"} ${n.toFixed(2)}`;
   }
 
   function imgUrl(path){
-    if (!path) return "https://picsum.photos/seed/suhaib/800/600";
+    if (!path) return "logo.png";
     const { data } = client.storage.from(cfg.bucket).getPublicUrl(path);
-    return data.publicUrl;
+    return data.publicUrl || "logo.png";
   }
 
   function render(){
@@ -40,16 +42,19 @@
 
     grid.innerHTML = list.map(p => `
       <div class="card">
-        <img src="${imgUrl(p.image_path)}" alt="${p.title || ""}">
+        <img src="${imgUrl(p.image_path)}" alt="">
         <div class="content">
           <div class="titleRow">
             <h3>${p.title || ""}</h3>
             <div class="price">${money(p.price, p.currency)}</div>
           </div>
-          ${p.description ? `<div class="desc">${p.description}</div>` : `<div class="desc">—</div>`}
+          <div class="desc">${p.description || "—"}</div>
           ${p.featured ? `<div class="pill">⭐ Featured</div>` : ``}
           <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-            <a class="btn primary" target="_blank" rel="noopener" href="${waLink}">اطلب على واتساب</a>
+            <a class="btn primary" target="_blank" rel="noopener"
+               href="${waLink}?text=${encodeURIComponent("مرحباً، بدي أطلب: " + (p.title||""))}">
+              اطلب على واتساب
+            </a>
             <a class="btn" target="_blank" rel="noopener" href="${cfg.instagramUrl}">اطلب على انستغرام</a>
           </div>
         </div>
