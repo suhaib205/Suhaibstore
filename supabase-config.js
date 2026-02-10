@@ -5,5 +5,5 @@ window.SUPABASE_CONFIG = {
 
   brandName: "Suhaib Store",
   instagramUrl: "https://instagram.com/suhaib._.store",
-  whatsappNumber: "966500000000" // حط رقمك مع كود الدولة بدون +
+  whatsappNumber: "0574640815" // غيره لرقمك بدون +
 };
