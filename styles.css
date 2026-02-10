@@ -47,3 +47,15 @@
   color: #38bdf8;
   margin-top: 6px;
 }
+/* Fix phone photos rotation (EXIF orientation) */
+.thumb img {
+  image-orientation: from-image;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.thumb {
+  aspect-ratio: 1 / 1; /* كرت مربع مرتب */
+  overflow: hidden;
+}
