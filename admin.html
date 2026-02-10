@@ -8,114 +8,81 @@
   <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
+
 <header>
   <div class="wrap topbar">
-    <a class="brand" href="index.html">
+    <a class="brand" href="./">
       <img src="logo.png" alt="Logo"/>
       <div>
-        <div class="name">Admin</div>
-        <div class="hint">إضافة/حذف منتجات + رفع صور</div>
+        <div class="name">Suhaib Store</div>
+        <div class="hint">Admin Panel</div>
       </div>
     </a>
 
     <div class="controls">
-      <button id="langBtn">English</button>
-      <button id="logoutBtn" style="display:none;">Logout</button>
+      <button id="logoutBtn" style="display:none;">تسجيل خروج</button>
+      <a class="btn btn-ghost" href="./">رجوع للمتجر</a>
     </div>
   </div>
 </header>
 
 <main class="wrap">
-  <div class="panel" id="authPanel">
-    <div class="hint" id="authHint">سجّل دخول (Email/Password) من Supabase Auth</div>
-    <div style="height:10px"></div>
-    <div class="row">
-      <div>
-        <div class="hint">Email</div>
-        <input id="email" type="email" placeholder="you@example.com"/>
-      </div>
-      <div>
-        <div class="hint">Password</div>
-        <input id="password" type="password" placeholder="********"/>
-      </div>
-    </div>
-    <div style="height:10px"></div>
-    <button id="loginBtn">Login</button>
-    <div class="hint" id="authStatus" style="margin-top:10px;"></div>
-  </div>
+  <!-- LOGIN -->
+  <section class="hero" id="loginBox">
+    <div class="hero-inner" style="align-items:flex-start;">
+      <div style="width:100%; max-width:520px;">
+        <h1 style="margin:0 0 10px;">تسجيل دخول الأدمن</h1>
+        <p style="margin:0 0 14px; color:rgba(255,255,255,.72);">فقط أنت تقدر تضيف/تعدل منتجات.</p>
 
-  <div class="panel" id="adminPanel" style="display:none;">
-    <h3 style="margin-top:0" id="addTitle">إضافة منتج</h3>
-
-    <div class="row">
-      <div>
-        <div class="hint">اسم المنتج (عربي)</div>
-        <input id="title_ar"/>
-      </div>
-      <div>
-        <div class="hint">Title (English)</div>
-        <input id="title_en"/>
+        <div style="display:grid; gap:10px;">
+          <input id="email" type="email" placeholder="Email">
+          <input id="password" type="password" placeholder="Password">
+          <button id="loginBtn" class="btn btn-primary" style="justify-content:center;">دخول</button>
+          <div class="status" id="loginMsg"></div>
+        </div>
       </div>
     </div>
+  </section>
 
-    <div style="height:10px"></div>
+  <!-- ADMIN FORM -->
+  <section class="hero" id="adminBox" style="display:none;">
+    <div class="hero-inner" style="align-items:flex-start;">
+      <div style="width:100%;">
+        <h1 style="margin:0 0 10px;">إضافة منتج</h1>
 
-    <div class="row">
-      <div>
-        <div class="hint">السعر</div>
-        <input id="price" placeholder="مثال: 15$"/>
-      </div>
-      <div>
-        <div class="hint">التصنيف</div>
-        <input id="category" placeholder="ChatGPT / Canva / Office"/>
-      </div>
-    </div>
+        <div style="display:grid; gap:10px; grid-template-columns:1fr 1fr;">
+          <input id="title_ar" placeholder="اسم المنتج (عربي)">
+          <input id="title_en" placeholder="Title (English)">
+          <input id="price" placeholder="السعر (مثال: 15$)">
+          <input id="category" placeholder="التصنيف (مثال: Subscriptions)">
+          <input id="desc_ar" placeholder="وصف (عربي)">
+          <input id="desc_en" placeholder="Description (English)">
+        </div>
 
-    <div style="height:10px"></div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; align-items:center;">
+          <label class="btn" style="cursor:pointer;">
+            اختر صورة
+            <input id="image" type="file" accept="image/*" style="display:none;">
+          </label>
 
-    <div class="row">
-      <div>
-        <div class="hint">وصف (عربي)</div>
-        <textarea id="desc_ar" rows="4" style="width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--b);"></textarea>
-      </div>
-      <div>
-        <div class="hint">Description (English)</div>
-        <textarea id="desc_en" rows="4" style="width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--b);"></textarea>
-      </div>
-    </div>
+          <select id="featured">
+            <option value="false">Featured: No</option>
+            <option value="true">Featured: Yes</option>
+          </select>
 
-    <div style="height:10px"></div>
-
-    <div class="row">
-      <div>
-        <div class="hint">صورة المنتج</div>
-        <input id="image" type="file" accept="image/*"/>
-        <div class="hint" id="imgHint">سيتم رفع الصورة على Supabase Storage</div>
-      </div>
-      <div>
-        <div class="hint">Featured</div>
-        <select id="featured">
-          <option value="false">No</option>
-          <option value="true">Yes</option>
-        </select>
+          <button id="saveBtn" class="btn btn-primary" style="justify-content:center;">حفظ</button>
+          <div class="status" id="saveMsg"></div>
+        </div>
       </div>
     </div>
+  </section>
 
-    <div style="height:10px"></div>
-    <button id="saveBtn">حفظ</button>
-    <div class="hint" id="saveStatus" style="margin-top:10px;"></div>
-
-    <hr/>
-
-    <h3 style="margin-top:0" id="listTitle">المنتجات الحالية</h3>
-    <div class="hint" id="listStatus">Loading...</div>
-    <div style="height:10px"></div>
-    <div id="products" class="grid"></div>
-  </div>
+  <div class="status" id="adminHint" style="margin-top:10px;"></div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="admin.js"></script>
+
 </body>
 </html>
