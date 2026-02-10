@@ -1,153 +1,315 @@
-(() => {
-  const cfg = window.SUPABASE_CONFIG;
-  const client = supabase.createClient(cfg.url, cfg.anonKey);
+// admin.js (FULL FILE)
 
-  const loginPanel = document.getElementById("loginPanel");
-  const adminPanel = document.getElementById("adminPanel");
-  const loginBtn = document.getElementById("loginBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const loginStatus = document.getElementById("loginStatus");
+// ملاحظة: لازم يكون في supabase-config.js متغير اسمه supabaseClient
+// مثال: window.supabaseClient = supabase.createClient(URL, KEY);
 
-  const titleEl = document.getElementById("title");
-  const priceEl = document.getElementById("price");
-  const currencyEl = document.getElementById("currency");
-  const featuredEl = document.getElementById("featured");
-  const descEl = document.getElementById("description");
-  const imageEl = document.getElementById("image");
-  const saveBtn = document.getElementById("saveBtn");
-  const statusEl = document.getElementById("status");
-  const listEl = document.getElementById("list");
+const $ = (id) => document.getElementById(id);
 
-  function setMsg(el, msg, ok=false){
-    el.className = "status " + (ok ? "ok" : "err");
-    el.textContent = msg || "";
+const loginSection = $("loginSection");
+const adminSection = $("adminSection");
+
+const emailInput = $("email");
+const passInput = $("password");
+const loginBtn = $("loginBtn");
+const logoutBtn = $("logoutBtn");
+
+const loginMsg = $("loginMsg");
+const saveMsg = $("saveMsg");
+
+const titleInput = $("title");
+const priceInput = $("price");
+const currencyInput = $("currency");
+const featuredSelect = $("featured");
+const descriptionInput = $("description");
+const imageInput = $("image");
+
+const saveBtn = $("saveBtn");
+const refreshBtn = $("refreshBtn");
+const productsList = $("productsList");
+
+function setMsg(el, text, type = "") {
+  if (!el) return;
+  el.classList.remove("ok", "err");
+  if (type === "ok") el.classList.add("ok");
+  if (type === "err") el.classList.add("err");
+  el.textContent = text || "";
+}
+
+function requireSupabase() {
+  if (!window.supabaseClient) {
+    setMsg(loginMsg, "❌ خطأ: supabaseClient غير موجود. تأكد supabase-config.js صح.", "err");
+    throw new Error("supabaseClient not found. Check supabase-config.js");
+  }
+  return window.supabaseClient;
+}
+
+async function showUIForSession() {
+  const supabaseClient = requireSupabase();
+  const { data, error } = await supabaseClient.auth.getSession();
+
+  if (error) {
+    setMsg(loginMsg, "❌ مشكلة في قراءة الجلسة: " + error.message, "err");
+    loginSection.style.display = "block";
+    adminSection.style.display = "none";
+    logoutBtn.style.display = "none";
+    return;
   }
 
-  async function refreshAuthUI(){
-    const { data } = await client.auth.getSession();
-    const authed = !!data?.session;
+  const session = data?.session;
 
-    loginPanel.style.display = authed ? "none" : "block";
-    adminPanel.style.display = authed ? "block" : "none";
-    logoutBtn.style.display = authed ? "inline-flex" : "none";
+  if (session?.user) {
+    // Logged in
+    loginSection.style.display = "none";
+    adminSection.style.display = "block";
+    logoutBtn.style.display = "inline-flex";
+    setMsg(saveMsg, "✅ تم تسجيل الدخول: " + (session.user.email || ""), "ok");
+    await loadProducts();
+  } else {
+    // Logged out
+    loginSection.style.display = "block";
+    adminSection.style.display = "none";
+    logoutBtn.style.display = "none";
+  }
+}
 
-    if (authed) await loadProducts();
+async function doLogin() {
+  const supabaseClient = requireSupabase();
+  setMsg(loginMsg, "⏳ جاري تسجيل الدخول...");
+
+  const email = (emailInput?.value || "").trim();
+  const password = passInput?.value || "";
+
+  if (!email || !password) {
+    setMsg(loginMsg, "❌ اكتب الإيميل وكلمة المرور.", "err");
+    return;
   }
 
-  loginBtn.addEventListener("click", async () => {
-    setMsg(loginStatus, "جاري تسجيل الدخول...", true);
-
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-
-    if (!email || !password) return setMsg(loginStatus, "اكتب الإيميل والباسورد");
-
-    const { error } = await client.auth.signInWithPassword({ email, password });
-    if (error) return setMsg(loginStatus, "خطأ دخول: " + error.message);
-
-    setMsg(loginStatus, "تم تسجيل الدخول ✅", true);
-    await refreshAuthUI();
-  });
-
-  logoutBtn.addEventListener("click", async () => {
-    await client.auth.signOut();
-    await refreshAuthUI();
-  });
-
-  function publicUrl(path){
-    const { data } = client.storage.from(cfg.bucket).getPublicUrl(path);
-    return data.publicUrl || "logo.png";
-  }
-
-  async function uploadImage(file){
-    if (!file) return null;
-
-    const ext = (file.name.split(".").pop() || "png").toLowerCase();
-    const path = `products/${Date.now()}-${Math.random().toString(16).slice(2)}.${ext}`;
-
-    const { error } = await client.storage.from(cfg.bucket).upload(path, file, {
-      cacheControl: "3600",
-      upsert: false
+  try {
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password,
     });
-    if (error) throw error;
-    return path;
-  }
-
-  async function loadProducts(){
-    const { data, error } = await client
-      .from("products")
-      .select("*")
-      .order("created_at", { ascending: false });
 
     if (error) {
-      listEl.innerHTML = `<div class="small">خطأ تحميل: ${error.message}</div>`;
+      setMsg(loginMsg, "❌ فشل تسجيل الدخول: " + error.message, "err");
       return;
     }
 
-    listEl.innerHTML = (data || []).map(p => `
-      <div class="card">
-        <img src="${p.image_path ? publicUrl(p.image_path) : "logo.png"}" alt="">
-        <div class="content">
-          <div class="titleRow">
-            <h3>${p.title || ""}</h3>
-            <div class="price">${(p.currency || "USD")} ${p.price ? Number(p.price).toFixed(2) : ""}</div>
-          </div>
-          <div class="desc">${p.description || "—"}</div>
-          ${p.featured ? `<div class="pill">⭐ Featured</div>` : ``}
-          <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-            <button class="btn" data-del="${p.id}">حذف</button>
-          </div>
-        </div>
-      </div>
-    `).join("");
+    if (data?.user) {
+      setMsg(loginMsg, "✅ تم تسجيل الدخول بنجاح.", "ok");
+    } else {
+      setMsg(loginMsg, "⚠️ تم الطلب لكن لم يتم إنشاء جلسة. جرّب تحديث الصفحة.", "err");
+    }
 
-    listEl.querySelectorAll("[data-del]").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const id = btn.getAttribute("data-del");
-        if (!confirm("متأكد بدك تحذف المنتج؟")) return;
+    await showUIForSession();
+  } catch (e) {
+    setMsg(loginMsg, "❌ خطأ غير متوقع: " + (e?.message || e), "err");
+  }
+}
 
-        const { error } = await client.from("products").delete().eq("id", id);
-        if (error) return setMsg(statusEl, "خطأ حذف: " + error.message);
-        setMsg(statusEl, "تم الحذف ✅", true);
-        await loadProducts();
-      });
-    });
+async function doLogout() {
+  const supabaseClient = requireSupabase();
+  setMsg(saveMsg, "⏳ جاري تسجيل الخروج...");
+  await supabaseClient.auth.signOut();
+  setMsg(saveMsg, "");
+  await showUIForSession();
+}
+
+function makePublicImageUrl(image_path) {
+  // إذا كانت الصورة مخزنة كسطر في DB (image_path) مثل: "12345.png" أو "folder/123.png"
+  // خلي admin.js يبني رابطها من Bucket
+  const supabaseClient = requireSupabase();
+  const { data } = supabaseClient.storage.from("product-images").getPublicUrl(image_path);
+  return data?.publicUrl || "";
+}
+
+async function uploadImageIfAny() {
+  const supabaseClient = requireSupabase();
+  const file = imageInput?.files?.[0];
+
+  if (!file) return null;
+
+  // اسم ملف فريد
+  const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+  const fileName = `${Date.now()}-${Math.random().toString(16).slice(2)}.${ext}`;
+
+  // رفع على bucket product-images
+  const { data, error } = await supabaseClient.storage
+    .from("product-images")
+    .upload(fileName, file, { upsert: false });
+
+  if (error) throw error;
+  return data?.path || fileName;
+}
+
+async function addProduct() {
+  const supabaseClient = requireSupabase();
+  setMsg(saveMsg, "⏳ جاري الحفظ...");
+
+  const title = (titleInput?.value || "").trim();
+  const price = priceInput?.value ? Number(priceInput.value) : null;
+  const currency = (currencyInput?.value || "USD").trim() || "USD";
+  const featured = featuredSelect?.value === "true";
+  const description = (descriptionInput?.value || "").trim() || null;
+
+  if (!title) {
+    setMsg(saveMsg, "❌ اكتب اسم المنتج.", "err");
+    return;
   }
 
-  saveBtn.addEventListener("click", async () => {
-    try{
-      setMsg(statusEl, "جاري الحفظ...", true);
-
-      const title = titleEl.value.trim();
-      if (!title) return setMsg(statusEl, "اكتب اسم المنتج");
-
-      const price = priceEl.value ? Number(priceEl.value) : null;
-      const currency = currencyEl.value.trim() || "USD";
-      const featured = featuredEl.value === "true";
-      const description = descEl.value.trim() || null;
-
-      const file = imageEl.files?.[0] || null;
-      const image_path = file ? await uploadImage(file) : null;
-
-      const { error } = await client.from("products").insert([{
-        title, price, currency, featured, description, image_path
-      }]);
-
-      if (error) return setMsg(statusEl, "خطأ حفظ: " + error.message);
-
-      setMsg(statusEl, "تم الحفظ ✅", true);
-
-      titleEl.value = "";
-      priceEl.value = "";
-      featuredEl.value = "false";
-      descEl.value = "";
-      imageEl.value = "";
-
-      await loadProducts();
-    } catch(e){
-      setMsg(statusEl, "خطأ: " + (e?.message || e));
+  try {
+    // رفع صورة إن وجدت
+    let image_path = null;
+    if (imageInput?.files?.length) {
+      image_path = await uploadImageIfAny();
     }
-  });
 
-  refreshAuthUI();
+    const payload = {
+      title,
+      price,
+      currency,
+      featured,
+      description,
+      image_path,
+    };
+
+    const { error } = await supabaseClient.from("products").insert(payload);
+    if (error) throw error;
+
+    setMsg(saveMsg, "✅ تم حفظ المنتج.", "ok");
+
+    // تفريغ الحقول
+    titleInput.value = "";
+    priceInput.value = "";
+    descriptionInput.value = "";
+    featuredSelect.value = "false";
+    imageInput.value = "";
+
+    await loadProducts();
+  } catch (e) {
+    setMsg(saveMsg, "❌ خطأ بالحفظ: " + (e?.message || e), "err");
+  }
+}
+
+async function deleteProduct(id, image_path) {
+  const supabaseClient = requireSupabase();
+  if (!confirm("متأكد بدك تحذف المنتج؟")) return;
+
+  try {
+    // حذف الصورة إذا موجودة
+    if (image_path) {
+      await supabaseClient.storage.from("product-images").remove([image_path]);
+    }
+    const { error } = await supabaseClient.from("products").delete().eq("id", id);
+    if (error) throw error;
+
+    await loadProducts();
+  } catch (e) {
+    alert("❌ خطأ بالحذف: " + (e?.message || e));
+  }
+}
+
+function renderProducts(items) {
+  productsList.innerHTML = "";
+
+  if (!items?.length) {
+    productsList.innerHTML = `<div style="color:rgba(255,255,255,.65)">لا يوجد منتجات.</div>`;
+    return;
+  }
+
+  for (const p of items) {
+    const div = document.createElement("div");
+    div.className = "item";
+
+    const thumb = document.createElement("div");
+    thumb.className = "thumb";
+
+    if (p.image_path) {
+      const img = document.createElement("img");
+      img.src = makePublicImageUrl(p.image_path);
+      img.alt = p.title || "product";
+      thumb.appendChild(img);
+    } else {
+      thumb.textContent = "بدون صورة";
+    }
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+
+    const title = document.createElement("strong");
+    title.textContent = p.title || "";
+
+    const price = document.createElement("small");
+    const priceText = (p.price !== null && p.price !== undefined) ? `${p.currency || "USD"} ${p.price}` : "بدون سعر";
+    price.textContent = priceText + (p.featured ? " ⭐ Featured" : "");
+
+    const desc = document.createElement("small");
+    desc.textContent = p.description ? p.description : "";
+
+    const actions = document.createElement("div");
+    actions.className = "item-actions";
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "btn danger";
+    delBtn.type = "button";
+    delBtn.textContent = "حذف";
+    delBtn.onclick = () => deleteProduct(p.id, p.image_path);
+
+    actions.appendChild(delBtn);
+
+    meta.appendChild(title);
+    meta.appendChild(price);
+    if (p.description) meta.appendChild(desc);
+    meta.appendChild(actions);
+
+    div.appendChild(thumb);
+    div.appendChild(meta);
+
+    productsList.appendChild(div);
+  }
+}
+
+async function loadProducts() {
+  const supabaseClient = requireSupabase();
+
+  const { data, error } = await supabaseClient
+    .from("products")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    // هذا خطير: يعني RLS أو جدول أو صلاحيات
+    setMsg(saveMsg, "❌ خطأ تحميل المنتجات: " + error.message, "err");
+    productsList.innerHTML = "";
+    return;
+  }
+
+  renderProducts(data || []);
+}
+
+function wireEvents() {
+  loginBtn?.addEventListener("click", doLogin);
+  logoutBtn?.addEventListener("click", doLogout);
+  saveBtn?.addEventListener("click", addProduct);
+  refreshBtn?.addEventListener("click", loadProducts);
+
+  // Enter يعمل تسجيل دخول
+  passInput?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") doLogin();
+  });
+}
+
+(async function init() {
+  try {
+    wireEvents();
+    await showUIForSession();
+
+    // إذا الجلسة تغيرت (تسجيل دخول/خروج) يحدث UI
+    const supabaseClient = requireSupabase();
+    supabaseClient.auth.onAuthStateChange(async () => {
+      await showUIForSession();
+    });
+  } catch (e) {
+    console.error(e);
+  }
 })();
