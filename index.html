@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Suhaib Store</title>
+  <link rel="icon" href="logo.png"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+<header>
+  <div class="wrap topbar">
+    <a class="brand" href="./">
+      <img src="logo.png" alt="Logo"/>
+      <div>
+        <div class="name" id="storeName">Suhaib Store</div>
+        <div class="hint" id="tagline">Digital products — order via WhatsApp</div>
+      </div>
+    </a>
+
+    <div class="controls">
+      <input id="search" placeholder="ابحث عن منتج..."/>
+      <select id="category"><option value="all">كل التصنيفات</option></select>
+      <button id="langBtn">English</button>
+      <a href="admin.html" class="hint">Admin</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hint" id="status">Loading...</div>
+  <div style="height:10px"></div>
+  <div id="list" class="grid"></div>
+  <div class="hint" id="empty" style="display:none;">لا يوجد منتجات بعد.</div>
+</main>
+
+<footer class="wrap hint">
+  © <span id="year"></span> <span id="storeName2">Suhaib Store</span>
+</footer>
+
+<!-- Supabase JS (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="store-config.js"></script>
+<script src="supabase-config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
