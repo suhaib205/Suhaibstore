@@ -1,88 +1,94 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Admin — Suhaib Store</title>
-  <link rel="icon" href="logo.png"/>
-  <link rel="stylesheet" href="styles.css"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin • Suhaib Store</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-
-<header>
-  <div class="wrap topbar">
-    <a class="brand" href="./">
-      <img src="logo.png" alt="Logo"/>
-      <div>
-        <div class="name">Suhaib Store</div>
-        <div class="hint">Admin Panel</div>
+  <div class="adminWrap">
+    <div class="nav">
+      <div class="brand">
+        <img src="logo.png" alt="logo" />
+        <div>
+          <h1>Admin</h1>
+          <div class="badge">إضافة/تعديل المنتجات</div>
+        </div>
       </div>
-    </a>
+      <div class="actions">
+        <a class="btn" href="index.html">رجوع للموقع</a>
+        <button class="btn" id="logoutBtn" style="display:none">تسجيل خروج</button>
+      </div>
+    </div>
 
-    <div class="controls">
-      <button id="logoutBtn" style="display:none;">تسجيل خروج</button>
-      <a class="btn btn-ghost" href="./">رجوع للمتجر</a>
+    <div class="hero">
+      <div id="loginPanel" class="panel">
+        <h2 style="margin:0 0 8px 0">تسجيل الدخول</h2>
+        <div class="row">
+          <div>
+            <label>الإيميل</label>
+            <input class="input" id="email" placeholder="email@example.com" />
+          </div>
+          <div>
+            <label>كلمة المرور</label>
+            <input class="input" id="password" type="password" placeholder="********" />
+          </div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn primary" id="loginBtn">دخول</button>
+        </div>
+        <div id="loginStatus" class="status"></div>
+      </div>
+
+      <div id="adminPanel" class="panel" style="display:none;margin-top:14px">
+        <h2 style="margin:0 0 8px 0">إضافة منتج</h2>
+        <div class="row">
+          <div>
+            <label>اسم المنتج</label>
+            <input class="input" id="title" placeholder="ChatGPT Plus..." />
+          </div>
+          <div>
+            <label>السعر</label>
+            <input class="input" id="price" type="number" step="0.01" placeholder="15" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>العملة</label>
+            <input class="input" id="currency" value="USD" />
+          </div>
+          <div>
+            <label>Featured</label>
+            <select id="featured">
+              <option value="false">No</option>
+              <option value="true">Yes</option>
+            </select>
+          </div>
+        </div>
+
+        <label>وصف (اختياري)</label>
+        <textarea class="input" id="description" rows="3" placeholder="تفاصيل المنتج..."></textarea>
+
+        <label>صورة المنتج</label>
+        <input class="input" id="image" type="file" accept="image/*" />
+
+        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn primary" id="saveBtn">حفظ</button>
+        </div>
+
+        <div id="status" class="status"></div>
+
+        <div class="hr"></div>
+        <h2 style="margin:0 0 8px 0">المنتجات الحالية</h2>
+        <div id="list" class="grid"></div>
+      </div>
     </div>
   </div>
-</header>
 
-<main class="wrap">
-  <!-- LOGIN -->
-  <section class="hero" id="loginBox">
-    <div class="hero-inner" style="align-items:flex-start;">
-      <div style="width:100%; max-width:520px;">
-        <h1 style="margin:0 0 10px;">تسجيل دخول الأدمن</h1>
-        <p style="margin:0 0 14px; color:rgba(255,255,255,.72);">فقط أنت تقدر تضيف/تعدل منتجات.</p>
-
-        <div style="display:grid; gap:10px;">
-          <input id="email" type="email" placeholder="Email">
-          <input id="password" type="password" placeholder="Password">
-          <button id="loginBtn" class="btn btn-primary" style="justify-content:center;">دخول</button>
-          <div class="status" id="loginMsg"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ADMIN FORM -->
-  <section class="hero" id="adminBox" style="display:none;">
-    <div class="hero-inner" style="align-items:flex-start;">
-      <div style="width:100%;">
-        <h1 style="margin:0 0 10px;">إضافة منتج</h1>
-
-        <div style="display:grid; gap:10px; grid-template-columns:1fr 1fr;">
-          <input id="title_ar" placeholder="اسم المنتج (عربي)">
-          <input id="title_en" placeholder="Title (English)">
-          <input id="price" placeholder="السعر (مثال: 15$)">
-          <input id="category" placeholder="التصنيف (مثال: Subscriptions)">
-          <input id="desc_ar" placeholder="وصف (عربي)">
-          <input id="desc_en" placeholder="Description (English)">
-        </div>
-
-        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; align-items:center;">
-          <label class="btn" style="cursor:pointer;">
-            اختر صورة
-            <input id="image" type="file" accept="image/*" style="display:none;">
-          </label>
-
-          <select id="featured">
-            <option value="false">Featured: No</option>
-            <option value="true">Featured: Yes</option>
-          </select>
-
-          <button id="saveBtn" class="btn btn-primary" style="justify-content:center;">حفظ</button>
-          <div class="status" id="saveMsg"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="status" id="adminHint" style="margin-top:10px;"></div>
-</main>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
-    <script src="admin.js"></script>
-</body>
-</html>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="admin.js"></script>
 </body>
 </html>
