@@ -1,162 +1,200 @@
+/* =========================
+   Suhaib Store - Clean Stable UI
+   ========================= */
+
+* { box-sizing: border-box; }
+
 :root{
-  --bg:#070b17;
-  --card:#0c1328;
-  --card2:#0b1022;
-  --txt:#eaf0ff;
-  --muted:#a8b3d6;
-  --line:rgba(255,255,255,.10);
-  --glow:rgba(120,160,255,.25);
-  --accent:#6ea8ff;
-  --accent2:#8b5cf6;
-  --radius:18px;
-  --shadow: 0 12px 40px rgba(0,0,0,.45);
-  font-synthesis-weight:none;
+  --bg: #0b1220;
+  --card: #111a2e;
+  --card2:#0f1730;
+  --text:#eaf0ff;
+  --muted:#a9b4d6;
+  --line: rgba(255,255,255,.12);
+  --btn:#2a6cff;
+  --btn2:#1f2a4a;
+  --shadow: 0 10px 30px rgba(0,0,0,.35);
 }
 
-*{box-sizing:border-box}
-html,body{height:100%}
+html, body { height: 100%; }
+
 body{
   margin:0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-  background:
-    radial-gradient(900px 500px at 20% 10%, rgba(139,92,246,.25), transparent 60%),
-    radial-gradient(900px 500px at 80% 30%, rgba(110,168,255,.20), transparent 60%),
-    var(--bg);
-  color:var(--txt);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: radial-gradient(1200px 700px at 70% 10%, rgba(60,120,255,.18), transparent 60%),
+              radial-gradient(900px 600px at 10% 30%, rgba(255,120,180,.12), transparent 55%),
+              var(--bg);
+  color: var(--text);
 }
 
-a{color:var(--accent); text-decoration:none}
-a:hover{text-decoration:underline}
-.wrap{max-width:1100px; margin:0 auto; padding:18px}
+a{ color: inherit; text-decoration: none; }
+
+.container{
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  padding: 18px 14px 40px;
+}
 
 header{
-  position:sticky; top:0; z-index:10;
-  backdrop-filter: blur(12px);
-  background: linear-gradient(to bottom, rgba(7,11,23,.92), rgba(7,11,23,.60));
-  border-bottom:1px solid var(--line);
+  text-align:center;
+  padding: 22px 0 10px;
 }
-.topbar{
-  display:flex; align-items:center; gap:14px;
-  justify-content:space-between;
-}
-.brand{
-  display:flex; align-items:center; gap:12px;
-  color:var(--txt);
-}
-.brand img{
-  width:44px; height:44px; border-radius:14px;
-  box-shadow: 0 0 0 1px var(--line), 0 10px 30px rgba(0,0,0,.35);
-}
-.name{font-weight:800; font-size:20px; letter-spacing:.2px}
-.hint{color:var(--muted); font-size:13px}
 
-.controls{
-  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+header h1{
+  margin:0;
+  font-size: 34px;
+  letter-spacing: .5px;
+  text-shadow: 0 6px 18px rgba(0,0,0,.35);
 }
-input, select, button{
-  border:1px solid var(--line);
-  background: rgba(255,255,255,.04);
-  color:var(--txt);
-  padding:10px 12px;
-  border-radius:14px;
-  outline:none;
+
+header p{
+  margin: 8px auto 0;
+  max-width: 720px;
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 14px;
 }
-input{min-width:220px}
-button{
+
+.top-actions{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-top: 14px;
+}
+
+.btn{
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.06);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 12px;
   cursor:pointer;
-  background: linear-gradient(135deg, rgba(110,168,255,.18), rgba(139,92,246,.16));
-  box-shadow: 0 0 0 1px rgba(255,255,255,.06) inset;
+  transition: transform .12s ease, background .12s ease, border-color .12s ease;
+  box-shadow: 0 10px 22px rgba(0,0,0,.15);
+  font-size: 14px;
 }
-button:hover{box-shadow: 0 0 0 1px rgba(255,255,255,.12) inset}
 
-main{padding-top:10px}
+.btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); }
+.btn-primary{
+  background: linear-gradient(135deg, rgba(42,108,255,1), rgba(112,88,255,1));
+  border-color: rgba(255,255,255,.18);
+}
+.btn-primary:hover{ background: linear-gradient(135deg, rgba(42,108,255,.95), rgba(112,88,255,.95)); }
 
-.grid{
+.bar{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content: space-between;
+  margin: 18px 0 12px;
+  padding: 12px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.search{
+  flex:1;
+  min-width: 180px;
+  background: rgba(0,0,0,.18);
+  border: 1px solid var(--line);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 12px;
+  outline: none;
+}
+
+.select{
+  background: rgba(0,0,0,.18);
+  border: 1px solid var(--line);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 12px;
+  outline: none;
+}
+
+.products{
   display:grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap:16px;
-}
-@media (max-width: 950px){
-  .grid{grid-template-columns: repeat(2, minmax(0, 1fr))}
-  input{min-width:180px}
-}
-@media (max-width: 520px){
-  .grid{grid-template-columns: 1fr}
-  input{min-width:160px; width:100%}
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 16px;
+  margin-top: 14px;
 }
 
-.card{
-  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-  border:1px solid var(--line);
-  border-radius: var(--radius);
+.product-card{
+  background: linear-gradient(180deg, rgba(17,26,46,.92), rgba(14,20,38,.92));
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 18px;
   overflow:hidden;
   box-shadow: var(--shadow);
-  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-}
-.card:hover{
-  transform: translateY(-3px);
-  border-color: rgba(110,168,255,.35);
-  box-shadow: 0 18px 55px rgba(0,0,0,.55);
+  display:flex;
+  flex-direction:column;
+  min-height: 310px;
 }
 
 .thumb{
-  width:100%;
-  aspect-ratio: 16 / 10;
-  background: rgba(255,255,255,.03);
+  width: 100%;
+  aspect-ratio: 1 / 1;
   overflow:hidden;
-  border-bottom:1px solid var(--line);
+  background: rgba(0,0,0,.25);
 }
+
+/* أهم سطرين لتصحيح شكل الصورة (بدون تكسير الصفحة) */
 .thumb img{
   width:100%;
   height:100%;
-  display:block;
   object-fit: cover;
-  image-orientation: from-image; /* إصلاح صور الجوال */
+  display:block;
+  image-orientation: from-image; /* يساعد لبعض صور الموبايل */
 }
 
-.body{padding:14px 14px 16px}
-.title{font-size:16px; font-weight:800; margin:0 0 6px}
-.desc{margin:0 0 10px; color:var(--muted); font-size:13px; line-height:1.5}
-.meta{display:flex; align-items:center; justify-content:space-between; gap:10px}
-.badge{
-  font-size:12px; color:var(--txt);
-  padding:6px 10px; border-radius:999px;
-  border:1px solid rgba(255,255,255,.12);
-  background: rgba(255,255,255,.04);
+.card-body{
+  padding: 12px 12px 14px;
+  display:flex;
+  flex-direction:column;
+  gap: 6px;
+  flex:1;
 }
+
+.title{
+  margin:0;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.desc{
+  margin:0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+  min-height: 38px;
+}
+
 .price{
-  font-weight:900;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
+  margin-top:auto;
+  font-weight: 700;
+  font-size: 14px;
+  color: #d7e2ff;
 }
 
-.actions{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap}
-.btn{
-  display:inline-flex; align-items:center; justify-content:center;
-  padding:10px 12px;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.12);
-  background: rgba(255,255,255,.04);
-  color:var(--txt);
-  font-weight:700;
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background: rgba(255, 214, 0, .12);
+  border: 1px solid rgba(255, 214, 0, .25);
+  color: #ffe27a;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  margin-top: 2px;
+  width: fit-content;
 }
-.btn.primary{
-  border-color: rgba(110,168,255,.35);
-  background: linear-gradient(135deg, rgba(110,168,255,.20), rgba(139,92,246,.18));
-  box-shadow: 0 0 0 1px rgba(255,255,255,.06) inset;
-}
-.btn:hover{filter:brightness(1.05)}
 
-.panel{
-  background: rgba(255,255,255,.03);
-  border:1px solid var(--line);
-  border-radius: var(--radius);
-  padding:16px;
-  box-shadow: var(--shadow);
+.footer{
+  text-align:center;
+  color: rgba(255,255,255,.55);
+  margin-top: 26px;
+  font-size: 12px;
 }
-.row{display:grid; grid-template-columns: 1fr 1fr; gap:12px}
-@media (max-width: 700px){ .row{grid-template-columns: 1fr} }
-
-footer{padding-bottom:28px}
