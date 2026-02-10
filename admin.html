@@ -2,93 +2,325 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin • Suhaib Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin | Suhaib Store</title>
+
+  <!-- لو عندك styles.css خليها -->
   <link rel="stylesheet" href="styles.css" />
+
+  <!-- ستايل خاص للأدمن (يعالج الخربطة بدون ما نعتمد على كود قديم) -->
+  <style>
+    :root{
+      --bg1:#070b1d;
+      --bg2:#0b1a3a;
+      --card:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.12);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.65);
+      --accent:#2ea8ff;
+      --danger:#ff4d4d;
+      --ok:#22c55e;
+    }
+
+    /* يمنع أي صورة/بانر قديم من تكسير الصفحة */
+    img, video, canvas {
+      max-width: 100%;
+      height: auto;
+    }
+
+    body.admin-page{
+      margin:0;
+      min-height:100vh;
+      color:var(--text);
+      background:
+        radial-gradient(900px 600px at 80% 10%, rgba(46,168,255,.20), transparent 60%),
+        radial-gradient(700px 500px at 20% 30%, rgba(168,85,247,.14), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+    }
+
+    .admin-wrap{
+      width: min(980px, 92vw);
+      margin: 28px auto 40px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.22);
+      border-radius: 14px;
+      backdrop-filter: blur(10px);
+    }
+
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .brand h1{
+      margin:0;
+      font-size: 22px;
+      letter-spacing:.2px;
+    }
+    .brand small{
+      color: var(--muted);
+    }
+
+    .top-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .btn{
+      appearance:none;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.07);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:700;
+      transition: .15s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height: 40px;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); }
+    .btn.primary{ background: rgba(46,168,255,.18); border-color: rgba(46,168,255,.35); }
+    .btn.primary:hover{ background: rgba(46,168,255,.24); }
+    .btn.danger{ background: rgba(255,77,77,.16); border-color: rgba(255,77,77,.35); }
+
+    .grid{
+      margin-top: 16px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:16px;
+    }
+    @media (min-width: 920px){
+      .grid{ grid-template-columns: 420px 1fr; align-items:start; }
+    }
+
+    .card{
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    .card h2{
+      margin:0 0 10px;
+      font-size: 18px;
+    }
+    .hint{
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0 0 14px;
+      line-height: 1.6;
+    }
+
+    label{
+      display:block;
+      margin: 10px 0 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    input, textarea, select{
+      width: 100%;
+      box-sizing:border-box;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      outline:none;
+    }
+    textarea{ min-height: 90px; resize: vertical; }
+
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 520px){
+      .row{ grid-template-columns: 1fr; }
+    }
+
+    .status{
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px dashed rgba(255,255,255,.18);
+      color: var(--muted);
+      font-size: 13px;
+      min-height: 20px;
+    }
+    .status.ok{ border-color: rgba(34,197,94,.35); color: rgba(34,197,94,.95); }
+    .status.err{ border-color: rgba(255,77,77,.40); color: rgba(255,77,77,.95); }
+
+    .products-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 10px;
+    }
+
+    .list{
+      display:grid;
+      gap:10px;
+    }
+
+    .item{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      border-radius: 14px;
+      padding: 12px;
+      display:grid;
+      grid-template-columns: 84px 1fr;
+      gap:12px;
+      align-items:center;
+    }
+
+    .thumb{
+      width:84px; height:84px;
+      border-radius: 14px;
+      overflow:hidden;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+    .meta{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .meta strong{ font-size: 15px; }
+    .meta small{ color: var(--muted); }
+
+    .item-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top: 8px;
+    }
+
+    .footer{
+      text-align:center;
+      color: rgba(255,255,255,.55);
+      margin-top: 18px;
+      font-size: 12px;
+    }
+  </style>
 </head>
-<body>
-  <div class="adminWrap">
-    <div class="nav">
+
+<body class="admin-page">
+  <div class="admin-wrap">
+    <!-- Top bar -->
+    <header class="topbar">
       <div class="brand">
-        <img src="logo.png" alt="logo" />
-        <div>
-          <h1>Admin</h1>
-          <div class="badge">الدخول مطلوب • إضافة/حذف منتجات</div>
-        </div>
-      </div>
-      <div class="actions">
-        <a class="btn" href="index.html">رجوع للموقع</a>
-        <button class="btn" id="logoutBtn" style="display:none">تسجيل خروج</button>
-      </div>
-    </div>
-
-    <div class="hero">
-      <div id="loginPanel" class="panel">
-        <h2 style="margin:0 0 8px 0">تسجيل الدخول</h2>
-        <div class="row">
-          <div>
-            <div class="small">الإيميل</div>
-            <input class="input" id="email" placeholder="email@example.com" />
-          </div>
-          <div>
-            <div class="small">كلمة المرور</div>
-            <input class="input" id="password" type="password" placeholder="********" />
-          </div>
-        </div>
-        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn primary" id="loginBtn">دخول</button>
-        </div>
-        <div id="loginStatus" class="status"></div>
+        <h1>Admin</h1>
+        <small>الدخول مطلوب • إضافة/تعديل/حذف منتجات</small>
       </div>
 
-      <div id="adminPanel" class="panel" style="display:none;margin-top:14px">
-        <h2 style="margin:0 0 8px 0">إضافة منتج</h2>
-
-        <div class="row">
-          <div>
-            <div class="small">اسم المنتج</div>
-            <input class="input" id="title" placeholder="ChatGPT Plus..." />
-          </div>
-          <div>
-            <div class="small">السعر</div>
-            <input class="input" id="price" type="number" step="0.01" placeholder="15" />
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:10px">
-          <div>
-            <div class="small">العملة</div>
-            <input class="input" id="currency" value="USD" />
-          </div>
-          <div>
-            <div class="small">Featured</div>
-            <select class="input" id="featured">
-              <option value="false">No</option>
-              <option value="true">Yes</option>
-            </select>
-          </div>
-        </div>
-
-        <div style="margin-top:10px" class="small">وصف (اختياري)</div>
-        <textarea class="input" id="description" rows="3" placeholder="تفاصيل المنتج..."></textarea>
-
-        <div style="margin-top:10px" class="small">صورة المنتج</div>
-        <input class="input" id="image" type="file" accept="image/*" />
-
-        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn primary" id="saveBtn">حفظ</button>
-        </div>
-
-        <div id="status" class="status"></div>
-
-        <div class="hr"></div>
-        <h2 style="margin:0 0 8px 0">المنتجات الحالية</h2>
-        <div id="list" class="grid"></div>
+      <div class="top-actions">
+        <a class="btn" href="./index.html">رجوع للموقع</a>
+        <button class="btn danger" id="logoutBtn" type="button" style="display:none;">تسجيل خروج</button>
       </div>
+    </header>
+
+    <div class="grid">
+      <!-- Left: Login + Add Product -->
+      <section class="card">
+        <!-- Login -->
+        <div id="loginSection">
+          <h2>تسجيل الدخول</h2>
+          <p class="hint">سجّل دخول بحسابك في Supabase (Authentication → Users).</p>
+
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="example@email.com" autocomplete="username" />
+
+          <label for="password">Password</label>
+          <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" />
+
+          <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn primary" id="loginBtn" type="button">تسجيل الدخول</button>
+          </div>
+
+          <div class="status" id="loginMsg"></div>
+        </div>
+
+        <!-- Admin form -->
+        <div id="adminSection" style="display:none; margin-top:16px;">
+          <h2>إضافة منتج</h2>
+
+          <label for="title">اسم المنتج</label>
+          <input id="title" type="text" placeholder="مثال: ChatGPT Plus" />
+
+          <div class="row">
+            <div>
+              <label for="price">السعر</label>
+              <input id="price" type="number" step="0.01" placeholder="15" />
+            </div>
+            <div>
+              <label for="currency">العملة</label>
+              <input id="currency" type="text" value="USD" />
+            </div>
+          </div>
+
+          <label for="featured">Featured</label>
+          <select id="featured">
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+          </select>
+
+          <label for="description">وصف (اختياري)</label>
+          <textarea id="description" placeholder="تفاصيل المنتج..."></textarea>
+
+          <label for="image">صورة المنتج</label>
+          <input id="image" type="file" accept="image/*" />
+
+          <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn primary" id="saveBtn" type="button">حفظ</button>
+          </div>
+
+          <div class="status" id="saveMsg"></div>
+        </div>
+      </section>
+
+      <!-- Right: Products -->
+      <section class="card">
+        <div class="products-title">
+          <h2 style="margin:0;">المنتجات الحالية</h2>
+          <button class="btn" id="refreshBtn" type="button">تحديث</button>
+        </div>
+
+        <p class="hint">هنا رح تشوف المنتجات اللي بالتخزين. (عرض/حذف/تعديل حسب كود admin.js)</p>
+
+        <div class="list" id="productsList"></div>
+
+        <div class="footer">© Suhaib Store 2026</div>
+      </section>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <!-- Scripts (بالترتيب المهم) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="admin.js"></script>
 </body>
