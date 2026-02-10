@@ -1,61 +1,181 @@
-/* ===== Product Cards ===== */
-.products {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
+/* ===== Global reset & safety ===== */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body { overflow-x: hidden; }
+
+/* Prevent any media from breaking layout */
+img, video, canvas, svg { max-width: 100%; height: auto; display: block; }
+
+/* ===== Theme ===== */
+:root{
+  --bg1:#050816;
+  --bg2:#070b1e;
+  --card: rgba(255,255,255,0.06);
+  --stroke: rgba(255,255,255,0.10);
+  --text:#e9ecff;
+  --muted:#aab2e7;
+  --accent:#5aa7ff;
+  --accent2:#7c5cff;
 }
 
-.product-card {
-  background: #0f172a;
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+body{
+  background: radial-gradient(1200px 600px at 70% 10%, rgba(122,92,255,0.18), transparent 60%),
+              radial-gradient(900px 500px at 10% 30%, rgba(90,167,255,0.16), transparent 60%),
+              linear-gradient(180deg, var(--bg1), var(--bg2));
+  color: var(--text);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
-.product-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 45px rgba(0,0,0,0.45);
+/* ===== Layout containers ===== */
+.container{
+  width: min(1100px, 94vw);
+  margin: 0 auto;
+  padding: 18px 0 28px;
 }
 
-/* ===== Image Fix (المهم) ===== */
-.product-card img {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;   /* 👈 هذا السطر يحل المشكلة */
-  display: block;
+header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding: 14px 0;
 }
 
-/* ===== Content ===== */
-.product-card .content {
-  padding: 14px;
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width: 0;
 }
-
-.product-card h3 {
-  margin: 0 0 6px;
-  font-size: 16px;
-  color: #e5e7eb;
-}
-
-.product-card p {
-  font-size: 13px;
-  color: #94a3b8;
-}
-
-.product-card .price {
-  font-weight: bold;
-  color: #38bdf8;
-  margin-top: 6px;
-}
-/* Fix phone photos rotation (EXIF orientation) */
-.thumb img {
-  image-orientation: from-image;
+.brand img{
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
   object-fit: cover;
+}
+.brand h1{
+  margin:0;
+  font-size: 18px;
+  letter-spacing: .2px;
+  white-space: nowrap;
+  overflow:hidden;
+  text-overflow: ellipsis;
+}
+
+.nav{
+  display:flex;
+  gap:10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.btn{
+  border:1px solid var(--stroke);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 14px;
+  cursor:pointer;
+  font-weight: 600;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+.btn:hover{
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.18);
+}
+.btn.primary{
+  background: linear-gradient(135deg, rgba(90,167,255,0.35), rgba(124,92,255,0.28));
+  border-color: rgba(90,167,255,0.35);
+}
+
+/* ===== Products grid ===== */
+.grid{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+/* Card */
+.product-card{
+  background: var(--card);
+  border: 1px solid var(--stroke);
+  border-radius: 18px;
+  overflow: hidden;          /* IMPORTANT: prevents image from escaping */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.30);
+  transition: transform .15s ease, border-color .15s ease;
+  min-width: 0;              /* IMPORTANT for grid overflow */
+}
+.product-card:hover{
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,0.18);
+}
+
+/* Thumbnail wrapper - forces square */
+.thumb{
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: rgba(255,255,255,0.04);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* Image itself - stays inside */
+.thumb img{
   width: 100%;
   height: 100%;
-  display: block;
+  object-fit: cover;
+  object-position: center;
+  image-orientation: from-image; /* EXIF rotate (supported on most browsers) */
 }
-.thumb {
-  aspect-ratio: 1 / 1; /* كرت مربع مرتب */
-  overflow: hidden;
+
+.product-body{
+  padding: 12px 12px 14px;
+  min-width:0;
+}
+.product-title{
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow:hidden;
+  text-overflow: ellipsis;
+}
+.product-desc{
+  margin:0 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+  max-height: 2.7em;
+  overflow:hidden;
+}
+.product-meta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.price{
+  font-weight: 900;
+  color: #cfe3ff;
+}
+
+/* Footer */
+footer{
+  margin-top: 22px;
+  color: rgba(255,255,255,0.55);
+  font-size: 12px;
+  text-align:center;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px){
+  .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px){
+  header{ flex-direction: column; align-items:flex-start; }
+  .nav{ width:100%; justify-content:flex-start; }
+  .grid{ grid-template-columns: 1fr; }
 }
