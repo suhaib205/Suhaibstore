@@ -1,230 +1,162 @@
-/* =========================
-   Suhaib Store - Safe Layout Reset
-   (fix rotate/overflow/tablet view)
-   ========================= */
-
 :root{
-  --bg: #070B1A;
-  --panel: rgba(255,255,255,0.06);
-  --panel2: rgba(255,255,255,0.10);
-  --text: #EAF0FF;
-  --muted: rgba(234,240,255,0.75);
-  --border: rgba(255,255,255,0.14);
-  --shadow: 0 18px 50px rgba(0,0,0,0.45);
+  --bg:#070b17;
+  --card:#0c1328;
+  --card2:#0b1022;
+  --txt:#eaf0ff;
+  --muted:#a8b3d6;
+  --line:rgba(255,255,255,.10);
+  --glow:rgba(120,160,255,.25);
+  --accent:#6ea8ff;
+  --accent2:#8b5cf6;
+  --radius:18px;
+  --shadow: 0 12px 40px rgba(0,0,0,.45);
+  font-synthesis-weight:none;
 }
 
-*{ box-sizing:border-box; }
-
-html, body{
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
-  overflow-x:hidden;
-}
-
+*{box-sizing:border-box}
+html,body{height:100%}
 body{
-  direction: rtl;
-  font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
-  color: var(--text);
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
   background:
-    radial-gradient(900px 500px at 15% 15%, rgba(118,86,255,0.35), transparent 60%),
-    radial-gradient(900px 500px at 80% 30%, rgba(0,209,255,0.18), transparent 60%),
-    linear-gradient(180deg, #060818 0%, #030412 100%);
+    radial-gradient(900px 500px at 20% 10%, rgba(139,92,246,.25), transparent 60%),
+    radial-gradient(900px 500px at 80% 30%, rgba(110,168,255,.20), transparent 60%),
+    var(--bg);
+  color:var(--txt);
 }
 
-/* IMPORTANT: prevent any accidental page rotation */
-body, main, header, section, .container{
-  transform: none !important;
-}
-
-a{ color:#9db3ff; text-decoration:none; }
-a:hover{ text-decoration:underline; }
-
-.container{
-  width:min(1100px, 92vw);
-  margin: 0 auto;
-  padding: 18px 0 40px;
-}
+a{color:var(--accent); text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:1100px; margin:0 auto; padding:18px}
 
 header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding: 14px 16px;
-  border:1px solid var(--border);
-  background: var(--panel);
-  border-radius: 16px;
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(10px);
+  position:sticky; top:0; z-index:10;
+  backdrop-filter: blur(12px);
+  background: linear-gradient(to bottom, rgba(7,11,23,.92), rgba(7,11,23,.60));
+  border-bottom:1px solid var(--line);
 }
-
+.topbar{
+  display:flex; align-items:center; gap:14px;
+  justify-content:space-between;
+}
 .brand{
-  display:flex;
-  align-items:center;
-  gap:10px;
+  display:flex; align-items:center; gap:12px;
+  color:var(--txt);
 }
 .brand img{
-  width:44px;
-  height:44px;
-  border-radius: 12px;
-  object-fit: cover;
-  border:1px solid var(--border);
+  width:44px; height:44px; border-radius:14px;
+  box-shadow: 0 0 0 1px var(--line), 0 10px 30px rgba(0,0,0,.35);
 }
-.brand h1{
-  margin:0;
-  font-size: 22px;
-  letter-spacing:0.2px;
-}
+.name{font-weight:800; font-size:20px; letter-spacing:.2px}
+.hint{color:var(--muted); font-size:13px}
 
-.top-actions{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
+.controls{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
 }
-
-.btn{
-  border:1px solid var(--border);
-  background: var(--panel2);
-  color: var(--text);
-  padding: 10px 14px;
-  border-radius: 12px;
+input, select, button{
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.04);
+  color:var(--txt);
+  padding:10px 12px;
+  border-radius:14px;
+  outline:none;
+}
+input{min-width:220px}
+button{
   cursor:pointer;
-  font-weight: 700;
+  background: linear-gradient(135deg, rgba(110,168,255,.18), rgba(139,92,246,.16));
+  box-shadow: 0 0 0 1px rgba(255,255,255,.06) inset;
 }
-.btn:hover{ filter:brightness(1.08); }
+button:hover{box-shadow: 0 0 0 1px rgba(255,255,255,.12) inset}
 
-.note{
-  margin: 14px 0 18px;
-  padding: 12px 14px;
-  border:1px solid var(--border);
-  background: rgba(255,255,255,0.05);
-  border-radius: 14px;
-  color: var(--muted);
-}
+main{padding-top:10px}
 
-.filters{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-  margin: 12px 0 16px;
-}
-
-.search{
-  flex:1;
-  min-width: 220px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding: 10px 12px;
-  border:1px solid var(--border);
-  background: var(--panel);
-  border-radius: 14px;
-}
-.search input{
-  width:100%;
-  border:none;
-  outline:none;
-  background:transparent;
-  color: var(--text);
-  font-size: 15px;
-}
-
-select{
-  border:1px solid var(--border);
-  background: var(--panel);
-  color: var(--text);
-  padding: 10px 12px;
-  border-radius: 14px;
-  outline:none;
-}
-
-/* Product grid */
 .grid{
   display:grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  gap:16px;
 }
-
 @media (max-width: 950px){
-  .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid{grid-template-columns: repeat(2, minmax(0, 1fr))}
+  input{min-width:180px}
 }
-@media (max-width: 580px){
-  header{ flex-direction:column; align-items:flex-start; }
-  .grid{ grid-template-columns: 1fr; }
+@media (max-width: 520px){
+  .grid{grid-template-columns: 1fr}
+  input{min-width:160px; width:100%}
 }
 
 .card{
-  border:1px solid var(--border);
-  background: var(--panel);
-  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  border:1px solid var(--line);
+  border-radius: var(--radius);
   overflow:hidden;
   box-shadow: var(--shadow);
-  backdrop-filter: blur(10px);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.card:hover{
+  transform: translateY(-3px);
+  border-color: rgba(110,168,255,.35);
+  box-shadow: 0 18px 55px rgba(0,0,0,.55);
 }
 
 .thumb{
   width:100%;
-  aspect-ratio: 1 / 1; /* مربّع */
-  background: rgba(255,255,255,0.04);
+  aspect-ratio: 16 / 10;
+  background: rgba(255,255,255,.03);
   overflow:hidden;
+  border-bottom:1px solid var(--line);
 }
-
 .thumb img{
   width:100%;
   height:100%;
   display:block;
   object-fit: cover;
-  image-orientation: from-image; /* يساعد على صور الجوال */
+  image-orientation: from-image; /* إصلاح صور الجوال */
 }
 
-.card-body{
-  padding: 12px 12px 14px;
-}
-
-.title{
-  margin:0 0 6px;
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--text);
-}
-
-.desc{
-  margin:0 0 10px;
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.5;
-  min-height: 38px;
-}
-
-.price-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-}
-
-.price{
-  font-weight: 900;
-  color: #b8c5ff;
-}
-
+.body{padding:14px 14px 16px}
+.title{font-size:16px; font-weight:800; margin:0 0 6px}
+.desc{margin:0 0 10px; color:var(--muted); font-size:13px; line-height:1.5}
+.meta{display:flex; align-items:center; justify-content:space-between; gap:10px}
 .badge{
-  font-size: 12px;
-  font-weight: 800;
-  padding: 6px 10px;
-  border-radius: 999px;
-  border:1px solid rgba(255,255,255,0.18);
-  background: rgba(255,255,255,0.08);
+  font-size:12px; color:var(--txt);
+  padding:6px 10px; border-radius:999px;
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04);
+}
+.price{
+  font-weight:900;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
 }
 
-.footer{
-  margin-top: 18px;
-  text-align:center;
-  color: rgba(234,240,255,0.55);
-  font-size: 12px;
+.actions{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:10px 12px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04);
+  color:var(--txt);
+  font-weight:700;
 }
+.btn.primary{
+  border-color: rgba(110,168,255,.35);
+  background: linear-gradient(135deg, rgba(110,168,255,.20), rgba(139,92,246,.18));
+  box-shadow: 0 0 0 1px rgba(255,255,255,.06) inset;
+}
+.btn:hover{filter:brightness(1.05)}
+
+.panel{
+  background: rgba(255,255,255,.03);
+  border:1px solid var(--line);
+  border-radius: var(--radius);
+  padding:16px;
+  box-shadow: var(--shadow);
+}
+.row{display:grid; grid-template-columns: 1fr 1fr; gap:12px}
+@media (max-width: 700px){ .row{grid-template-columns: 1fr} }
+
+footer{padding-bottom:28px}
