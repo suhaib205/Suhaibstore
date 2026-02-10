@@ -18,48 +18,45 @@
   const statusEl = document.getElementById("status");
   const listEl = document.getElementById("list");
 
-  function setStatus(el, msg, ok=false){
+  function setMsg(el, msg, ok=false){
     el.className = "status " + (ok ? "ok" : "err");
     el.textContent = msg || "";
   }
 
-  async function requireAuth(){
+  async function refreshAuthUI(){
     const { data } = await client.auth.getSession();
-    const session = data?.session;
-    if (session) {
-      loginPanel.style.display = "none";
-      adminPanel.style.display = "block";
-      logoutBtn.style.display = "inline-flex";
-      await loadProducts();
-    } else {
-      loginPanel.style.display = "block";
-      adminPanel.style.display = "none";
-      logoutBtn.style.display = "none";
-    }
+    const authed = !!data?.session;
+
+    loginPanel.style.display = authed ? "none" : "block";
+    adminPanel.style.display = authed ? "block" : "none";
+    logoutBtn.style.display = authed ? "inline-flex" : "none";
+
+    if (authed) await loadProducts();
   }
 
   loginBtn.addEventListener("click", async () => {
-    loginStatus.textContent = "";
+    setMsg(loginStatus, "جاري تسجيل الدخول...", true);
+
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
 
-    if (!email || !password) return setStatus(loginStatus, "اكتب الإيميل والباسورد");
+    if (!email || !password) return setMsg(loginStatus, "اكتب الإيميل والباسورد");
 
     const { error } = await client.auth.signInWithPassword({ email, password });
-    if (error) return setStatus(loginStatus, "خطأ دخول: " + error.message);
+    if (error) return setMsg(loginStatus, "خطأ دخول: " + error.message);
 
-    setStatus(loginStatus, "تم تسجيل الدخول ✅", true);
-    await requireAuth();
+    setMsg(loginStatus, "تم تسجيل الدخول ✅", true);
+    await refreshAuthUI();
   });
 
   logoutBtn.addEventListener("click", async () => {
     await client.auth.signOut();
-    await requireAuth();
+    await refreshAuthUI();
   });
 
   function publicUrl(path){
     const { data } = client.storage.from(cfg.bucket).getPublicUrl(path);
-    return data.publicUrl;
+    return data.publicUrl || "logo.png";
   }
 
   async function uploadImage(file){
@@ -89,11 +86,11 @@
 
     listEl.innerHTML = (data || []).map(p => `
       <div class="card">
-        <img src="${p.image_path ? publicUrl(p.image_path) : "https://picsum.photos/seed/suhaib-admin/800/600"}" alt="">
+        <img src="${p.image_path ? publicUrl(p.image_path) : "logo.png"}" alt="">
         <div class="content">
           <div class="titleRow">
             <h3>${p.title || ""}</h3>
-            <div class="price">${p.currency || "USD"} ${p.price ? Number(p.price).toFixed(2) : ""}</div>
+            <div class="price">${(p.currency || "USD")} ${p.price ? Number(p.price).toFixed(2) : ""}</div>
           </div>
           <div class="desc">${p.description || "—"}</div>
           ${p.featured ? `<div class="pill">⭐ Featured</div>` : ``}
@@ -110,8 +107,8 @@
         if (!confirm("متأكد بدك تحذف المنتج؟")) return;
 
         const { error } = await client.from("products").delete().eq("id", id);
-        if (error) return setStatus(statusEl, "خطأ حذف: " + error.message);
-        setStatus(statusEl, "تم الحذف ✅", true);
+        if (error) return setMsg(statusEl, "خطأ حذف: " + error.message);
+        setMsg(statusEl, "تم الحذف ✅", true);
         await loadProducts();
       });
     });
@@ -119,17 +116,16 @@
 
   saveBtn.addEventListener("click", async () => {
     try{
-      setStatus(statusEl, "جاري الحفظ...");
+      setMsg(statusEl, "جاري الحفظ...", true);
 
       const title = titleEl.value.trim();
-      if (!title) return setStatus(statusEl, "اكتب اسم المنتج");
+      if (!title) return setMsg(statusEl, "اكتب اسم المنتج");
 
       const price = priceEl.value ? Number(priceEl.value) : null;
       const currency = currencyEl.value.trim() || "USD";
       const featured = featuredEl.value === "true";
       const description = descEl.value.trim() || null;
 
-      // upload image
       const file = imageEl.files?.[0] || null;
       const image_path = file ? await uploadImage(file) : null;
 
@@ -137,11 +133,10 @@
         title, price, currency, featured, description, image_path
       }]);
 
-      if (error) return setStatus(statusEl, "خطأ حفظ: " + error.message);
+      if (error) return setMsg(statusEl, "خطأ حفظ: " + error.message);
 
-      setStatus(statusEl, "تم الحفظ ✅", true);
+      setMsg(statusEl, "تم الحفظ ✅", true);
 
-      // reset
       titleEl.value = "";
       priceEl.value = "";
       featuredEl.value = "false";
@@ -150,9 +145,9 @@
 
       await loadProducts();
     } catch(e){
-      setStatus(statusEl, "خطأ: " + (e?.message || e));
+      setMsg(statusEl, "خطأ: " + (e?.message || e));
     }
   });
 
-  requireAuth();
+  refreshAuthUI();
 })();
