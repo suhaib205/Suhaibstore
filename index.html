@@ -4,45 +4,17 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Suhaib Store</title>
-  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Cache bust for GitHub Pages -->
+  <link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
-  <div class="container">
-    <div class="nav">
-      <div class="brand">
-        <img src="logo.png" alt="logo" />
-        <div>
-          <h1 id="brandName">Suhaib Store</h1>
-          <div class="badge">الزبون يشاهد فقط • الطلب عبر التواصل</div>
-        </div>
-      </div>
-      <div class="actions">
-        <a class="btn primary" id="btnWhatsApp" target="_blank" rel="noopener">واتساب</a>
-        <a class="btn" id="btnInstagram" target="_blank" rel="noopener">انستغرام</a>
-        <a class="btn" href="admin.html">Admin</a>
-      </div>
-    </div>
-
-    <div class="hero">
-      <h2>منتجاتنا</h2>
-      <p>اضغط واتساب/انستغرام للتواصل وطلب المنتج.</p>
-
-      <div class="toolbar">
-        <input class="input" id="q" placeholder="ابحث..." />
-        <select id="filterFeatured">
-          <option value="all">كل المنتجات</option>
-          <option value="featured">Featured فقط</option>
-        </select>
-      </div>
-
-      <div class="hr"></div>
-      <div id="grid" class="grid"></div>
-      <div class="footer">© <span id="year"></span> <span id="brandName2">Suhaib Store</span></div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="supabase-config.js"></script>
-  <script src="app.js"></script>
+  <main style="padding:24px;font-family:system-ui">
+    <h1>Suhaib Store</h1>
+    <p>إذا تشوف هالصفحة بشكل طبيعي، معناها التحديث وصل و”الكاش” انكسر ✅</p>
+    <p>ارجع افتح الموقع من رابط GitHub Pages.</p>
+    <hr>
+    <a href="admin.html">Admin</a>
+  </main>
 </body>
 </html>
