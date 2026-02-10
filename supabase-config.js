@@ -1,9 +1,13 @@
-window.SUPABASE_CONFIG = {
-  url: "https://ziozomnceumhdwzccwke.supabase.co",
-  anonKey: "sb_publishable_RzTql6NRNONpdQsXm_MHNg_T0sv2PVh",
-  bucket: "product-images",
+// supabase-config.js (FULL FILE)
 
-  brandName: "Suhaib Store",
-  instagramUrl: "https://instagram.com/suhaib._.store",
-  whatsappNumber: "0574640815" // غيره لرقمك بدون +
-};
+// ⚠️ لا تعدّل أي شيء إلا السطرين التاليين فقط
+const SUPABASE_URL = "https://ziozomnceumhdwzccwke.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_RzTql6NRNONpdQsXm_MHNg_T0sv2PVh";
+
+// ===============================
+// لا تغيّر أي شيء تحت هذا السطر
+// ===============================
+window.supabaseClient = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
