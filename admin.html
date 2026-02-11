@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Suhaib Store - لوحة الإدارة</title>
+    <title>Suhaib Store - Admin</title>
 
     <style>
       :root {
@@ -14,8 +14,6 @@
         --border: rgba(255, 255, 255, 0.08);
         --accent: #5aa7ff;
         --danger: #ff5a7a;
-        --ok: #4ee59b;
-        --warning: #ffd36b;
         --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
         --radius: 14px;
       }
@@ -25,38 +23,13 @@
         margin: 0;
         font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Kufi Arabic", "Noto Sans Arabic", sans-serif;
         background: radial-gradient(900px 500px at 10% 0%, rgba(90,167,255,0.12), transparent),
-                    radial-gradient(700px 500px at 90% 10%, rgba(78,229,155,0.10), transparent),
+                    radial-gradient(700px 500px at 90% 10%, rgba(255,90,122,0.08), transparent),
                     var(--bg);
         color: var(--text);
       }
 
-      a { color: var(--accent); text-decoration: none; }
-      a:hover { text-decoration: underline; }
-
-      .container {
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 22px;
-      }
-
-      .topbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 18px;
-      }
-
-      .brand h1 {
-        font-size: 18px;
-        margin: 0;
-        letter-spacing: 0.2px;
-      }
-      .brand p {
-        margin: 6px 0 0;
-        color: var(--muted);
-        font-size: 13px;
-      }
+      .container { max-width: 1100px; margin: 0 auto; padding: 22px; }
+      .topbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 16px; flex-wrap: wrap; }
 
       .card {
         background: rgba(17, 27, 46, 0.92);
@@ -66,85 +39,85 @@
         padding: 16px;
       }
 
-      .grid {
-        display: grid;
-        grid-template-columns: 1fr 1.35fr;
-        gap: 14px;
-        margin-top: 14px;
-      }
+      .grid { display:grid; grid-template-columns: 1fr 1.4fr; gap: 14px; margin-top: 14px; }
+      @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
 
-      @media (max-width: 980px) {
-        .grid { grid-template-columns: 1fr; }
-      }
-
-      .row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-
-      .muted { color: var(--muted); }
-
-      .msg {
-        margin-top: 12px;
-        padding: 12px 12px;
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        background: rgba(255, 255, 255, 0.04);
-        color: var(--text);
-        font-size: 14px;
-        line-height: 1.6;
-      }
-      .msg.ok { border-color: rgba(78,229,155,0.35); }
-      .msg.err { border-color: rgba(255,90,122,0.35); }
-      .msg.warn { border-color: rgba(255,211,107,0.35); }
-
-      form { margin-top: 12px; }
-      label {
-        display: block;
-        font-size: 13px;
-        margin: 12px 0 6px;
-        color: var(--muted);
-      }
-      input, textarea, select {
-        width: 100%;
+      label { display:block; font-size: 13px; margin: 12px 0 6px; color: var(--muted); }
+      input, textarea {
+        width:100%;
         padding: 11px 12px;
         border-radius: 12px;
         border: 1px solid var(--border);
-        background: rgba(0, 0, 0, 0.18);
+        background: rgba(0,0,0,0.18);
         color: var(--text);
         outline: none;
       }
       textarea { min-height: 110px; resize: vertical; }
 
-      .btns {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-top: 12px;
-      }
+      .btns { display:flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
       button {
-        cursor: pointer;
+        cursor:pointer;
         border: 1px solid var(--border);
         background: rgba(255,255,255,0.06);
         color: var(--text);
         padding: 10px 12px;
         border-radius: 12px;
-        font-weight: 600;
+        font-weight: 800;
       }
       button:hover { filter: brightness(1.08); }
       .primary { background: rgba(90,167,255,0.15); border-color: rgba(90,167,255,0.35); }
-      .danger  { background: rgba(255,90,122,0.13); border-color: rgba(255,90,122,0.35); }
-      .ghost   { background: rgba(255,255,255,0.03); }
+      .danger { background: rgba(255,90,122,0.13); border-color: rgba(255,90,122,0.35); }
 
-      .hidden { display: none !important; }
+      .hidden { display:none !important; }
+
+      .msg {
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.04);
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .msg.ok { border-color: rgba(90,255,180,0.35); }
+      .msg.err { border-color: rgba(255,90,122,0.35); }
+      .msg.warn { border-color: rgba(255,211,107,0.35); }
+
+      .row { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap: wrap; }
+      .small { font-size: 12px; color: var(--muted); }
+
+      .tableWrap {
+        overflow:auto;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(0,0,0,0.12);
+        margin-top: 12px;
+      }
+      table { width:100%; border-collapse: collapse; min-width: 720px; }
+      th, td {
+        padding: 10px;
+        border-bottom: 1px solid var(--border);
+        text-align: right;
+        font-size: 13px;
+        vertical-align: middle;
+      }
+      th { color: var(--muted); background: rgba(255,255,255,0.03); font-weight: 900; }
+      .thumb { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; border: 1px solid var(--border); background: rgba(0,0,0,0.2); }
+
+      .pill {
+        display:inline-flex;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        font-weight: 900;
+        font-size: 12px;
+        opacity: .9;
+      }
 
       .preview {
-        display: flex;
+        display:flex;
         gap: 12px;
-        align-items: center;
+        align-items:center;
         margin-top: 12px;
         padding: 10px;
         border: 1px solid var(--border);
@@ -152,81 +125,12 @@
         background: rgba(255,255,255,0.03);
       }
       .preview img {
-        width: 68px;
-        height: 68px;
-        object-fit: cover;
+        width: 70px;
+        height: 70px;
         border-radius: 12px;
-        border: 1px solid var(--border);
-        background: rgba(0,0,0,0.2);
-      }
-
-      .tableWrap {
-        overflow: auto;
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        background: rgba(0,0,0,0.12);
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        min-width: 720px;
-      }
-      th, td {
-        text-align: right;
-        padding: 10px;
-        border-bottom: 1px solid var(--border);
-        vertical-align: middle;
-        font-size: 13px;
-      }
-      th { color: var(--muted); font-weight: 700; background: rgba(255,255,255,0.03); }
-      tr:hover td { background: rgba(255,255,255,0.02); }
-
-      .pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 4px 10px;
-        border-radius: 999px;
-        border: 1px solid var(--border);
-        font-weight: 700;
-        font-size: 12px;
-      }
-      .pill.featured { border-color: rgba(255,211,107,0.5); }
-      .pill.normal { opacity: 0.8; }
-
-      .thumb {
-        width: 44px;
-        height: 44px;
-        border-radius: 10px;
         object-fit: cover;
         border: 1px solid var(--border);
         background: rgba(0,0,0,0.2);
-      }
-
-      .actions {
-        display: inline-flex;
-        gap: 8px;
-      }
-
-      .small {
-        font-size: 12px;
-        color: var(--muted);
-      }
-
-      .checkboxRow {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-top: 12px;
-        padding: 10px 12px;
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        background: rgba(255,255,255,0.03);
-      }
-      .checkboxRow input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
       }
     </style>
   </head>
@@ -234,133 +138,104 @@
   <body>
     <div class="container">
       <div class="topbar">
-        <div class="brand">
-          <h1>Suhaib Store — لوحة الإدارة</h1>
-          <p>GitHub Pages + Supabase (Auth + Database + Storage)</p>
+        <div>
+          <div style="font-weight: 900; font-size: 18px;">Suhaib Store — Admin</div>
+          <div class="small">إضافة / تعديل / حذف منتجات + رفع صور (Supabase)</div>
         </div>
         <div class="row">
-          <a class="small" href="./index.html" target="_blank" rel="noopener">فتح المتجر ↗</a>
-          <button id="logoutBtnTop" class="danger hidden" type="button">تسجيل خروج</button>
+          <a class="small" href="./index.html" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none;">فتح المتجر ↗</a>
+          <button id="logoutBtn" class="danger hidden" type="button">تسجيل خروج</button>
         </div>
       </div>
 
       <div id="messageBox" class="msg hidden"></div>
 
-      <!-- ✅ Login Card -->
-      <section id="authSection" class="card">
-        <div class="row">
-          <div>
-            <h2 style="margin: 0; font-size: 16px;">تسجيل دخول Admin</h2>
-            <p class="muted" style="margin: 6px 0 0; font-size: 13px;">
-              فقط المستخدمون <b>authenticated</b> يمكنهم الإضافة/التعديل/الحذف حسب RLS.
-            </p>
-          </div>
-        </div>
+      <!-- Login -->
+      <section id="loginCard" class="card">
+        <h2 style="margin:0; font-size: 16px;">تسجيل دخول Admin</h2>
 
-        <form id="loginForm" autocomplete="on">
+        <form id="loginForm" style="margin-top: 12px;">
           <label for="email">الإيميل</label>
-          <input id="email" type="email" placeholder="admin@email.com" required autocomplete="username" />
+          <input id="email" type="email" required placeholder="admin@email.com" />
 
           <label for="password">كلمة المرور</label>
-          <input id="password" type="password" placeholder="••••••••" required autocomplete="current-password" />
+          <input id="password" type="password" required placeholder="••••••••" />
 
           <div class="btns">
-            <button id="loginBtn" class="primary" type="submit">دخول</button>
-            <button id="fillDemoBtn" class="ghost" type="button" title="اختياري للتجربة">تعبئة تجريبية</button>
+            <button class="primary" type="submit" id="loginBtn">دخول</button>
           </div>
 
-          <p class="small" style="margin-top: 10px;">
-            إذا كان تسجيل الدخول لا يعمل: تأكد أن Email Provider مفعل في Auth وأن المستخدم موجود.
-          </p>
+          <div class="small" style="margin-top:10px;">
+            إذا ظهر خطأ: تأكد أن المستخدم موجود في Supabase Auth وأن Email Provider مفعل.
+          </div>
         </form>
       </section>
 
-      <!-- ✅ Admin Panel -->
-      <section id="adminSection" class="hidden">
+      <!-- Panel -->
+      <section id="panel" class="hidden">
         <div class="grid">
-          <!-- Product Form -->
+          <!-- Form -->
           <div class="card">
             <div class="row">
               <div>
-                <h2 style="margin: 0; font-size: 16px;">إضافة / تعديل منتج</h2>
-                <p class="muted" style="margin: 6px 0 0; font-size: 13px;">
-                  الأعمدة المستخدمة: <code>title_ar</code>, <code>desc_ar</code>, <code>price</code>, <code>currency</code>, <code>image_url</code>, <code>featured</code>
-                </p>
+                <h2 style="margin:0; font-size: 16px;">المنتج</h2>
+                <div class="small">الأعمدة المستخدمة: title_ar, desc_ar, price, currency, image_url, featured</div>
               </div>
-              <span id="userInfo" class="small"></span>
+              <div id="userInfo" class="small"></div>
             </div>
 
-            <form id="productForm">
+            <form id="productForm" style="margin-top: 10px;">
               <input id="productId" type="hidden" />
 
               <label for="title_ar">اسم المنتج (عربي) *</label>
-              <input id="title_ar" type="text" required placeholder="مثال: ساعة ذكية" />
+              <input id="title_ar" type="text" required />
 
-              <label for="desc_ar">وصف المنتج (عربي)</label>
-              <textarea id="desc_ar" placeholder="اكتب وصفاً مختصراً وواضحاً..."></textarea>
+              <label for="desc_ar">وصف المنتج</label>
+              <textarea id="desc_ar"></textarea>
 
               <label for="price">السعر *</label>
-              <input id="price" type="text" required placeholder="مثال: 25" />
+              <input id="price" type="text" required />
 
               <label for="currency">العملة</label>
-              <input id="currency" type="text" placeholder="مثال: JOD" list="currencyList" />
-              <datalist id="currencyList">
-                <option value="JOD"></option>
-                <option value="USD"></option>
-                <option value="SAR"></option>
-                <option value="AED"></option>
-                <option value="EUR"></option>
-              </datalist>
+              <input id="currency" type="text" placeholder="مثال: JOD" value="JOD" />
 
-              <div class="checkboxRow">
-                <input id="featured" type="checkbox" />
-                <label for="featured" style="margin: 0; color: var(--text);">تمييز كـ Featured</label>
-              </div>
+              <label style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+                <input id="featured" type="checkbox" style="width:18px;height:18px;" />
+                <span>Featured</span>
+              </label>
 
               <label for="imageFile">صورة المنتج</label>
               <input id="imageFile" type="file" accept="image/*" />
 
               <div class="preview">
-                <img id="imagePreview" alt="معاينة الصورة" />
+                <img id="imagePreview" alt="preview" />
                 <div>
-                  <div style="font-weight: 700;">معاينة</div>
-                  <div id="imagePreviewText" class="small">لا توجد صورة حالياً</div>
+                  <div style="font-weight:900;">معاينة الصورة</div>
+                  <div id="previewText" class="small">لا توجد صورة</div>
                 </div>
               </div>
 
               <div class="btns">
-                <button id="saveBtn" class="primary" type="submit">حفظ المنتج</button>
-                <button id="clearBtn" class="ghost" type="button">تفريغ النموذج</button>
+                <button class="primary" type="submit" id="saveBtn">حفظ</button>
+                <button type="button" id="clearBtn">تفريغ</button>
               </div>
-
-              <p class="small" style="margin-top: 10px;">
-                رفع الصور يتم إلى bucket: <code>product-images</code> ثم نخزن الرابط في <code>image_url</code>.
-              </p>
             </form>
           </div>
 
-          <!-- Products List -->
+          <!-- List -->
           <div class="card">
             <div class="row">
               <div>
-                <h2 style="margin: 0; font-size: 16px;">قائمة المنتجات</h2>
-                <p class="muted" style="margin: 6px 0 0; font-size: 13px;">
-                  عرض مباشر من جدول <code>products</code>
-                </p>
+                <h2 style="margin:0; font-size: 16px;">المنتجات</h2>
+                <div class="small">عرض مباشر من جدول products</div>
               </div>
-              <div class="actions">
-                <button id="refreshBtn" class="ghost" type="button">تحديث</button>
-              </div>
+              <button type="button" id="refreshBtn">تحديث</button>
             </div>
 
-            <label for="searchInput">بحث</label>
-            <input id="searchInput" type="text" placeholder="اكتب جزء من اسم المنتج..." />
+            <label for="searchInput">بحث بالاسم</label>
+            <input id="searchInput" type="text" placeholder="اكتب جزء من الاسم..." />
 
-            <div class="msg warn" style="margin-top: 12px;">
-              ✅ تم إصلاح مشكلة العمود غير الموجود: لا يوجد أي استخدام لـ <code>title</code> هنا.
-            </div>
-
-            <div class="tableWrap" style="margin-top: 12px;">
+            <div class="tableWrap">
               <table>
                 <thead>
                   <tr>
@@ -368,27 +243,26 @@
                     <th>الاسم</th>
                     <th>السعر</th>
                     <th>Featured</th>
-                    <th>تاريخ الإضافة</th>
                     <th>إجراءات</th>
                   </tr>
                 </thead>
-                <tbody id="productsTbody">
-                  <!-- rows -->
-                </tbody>
+                <tbody id="tbody"></tbody>
               </table>
             </div>
 
-            <p id="countInfo" class="small" style="margin-top: 10px;"></p>
+            <div id="countInfo" class="small" style="margin-top:10px;"></div>
           </div>
         </div>
       </section>
     </div>
 
-    <!-- ✅ Supabase JS (UMD) -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- ✅ Your config -->
+    <!-- ✅ Supabase UMD -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+    <!-- ✅ Config -->
     <script src="./js/supabase-config.js"></script>
-    <!-- ✅ Admin logic -->
+
+    <!-- ✅ Admin JS -->
     <script src="./js/admin.js"></script>
   </body>
 </html>
