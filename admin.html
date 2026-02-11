@@ -1,268 +1,177 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Suhaib Store - Admin</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Suhaib Store - Admin</title>
 
-    <style>
-      :root {
-        --bg: #0b1220;
-        --card: #111b2e;
-        --text: #e9eefc;
-        --muted: #a9b4d0;
-        --border: rgba(255, 255, 255, 0.08);
-        --accent: #5aa7ff;
-        --danger: #ff5a7a;
-        --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
-        --radius: 14px;
-      }
+  <style>
+    :root{
+      --bg:#0b1220; --card:#111b2e; --text:#e9eefc; --muted:#a9b4d0;
+      --border:rgba(255,255,255,.08); --accent:#5aa7ff; --danger:#ff5a7a;
+      --shadow:0 12px 30px rgba(0,0,0,.35); --radius:14px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Kufi Arabic","Noto Sans Arabic",sans-serif;
+      background:radial-gradient(900px 500px at 10% 0%, rgba(90,167,255,.12), transparent),
+                radial-gradient(700px 500px at 90% 10%, rgba(255,90,122,.08), transparent),
+                var(--bg);
+      color:var(--text);
+    }
+    .container{max-width:1100px;margin:0 auto;padding:22px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+    .card{background:rgba(17,27,46,.92);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+    .grid{display:grid;grid-template-columns:1fr 1.4fr;gap:14px;margin-top:14px}
+    @media(max-width:980px){.grid{grid-template-columns:1fr}}
+    label{display:block;font-size:13px;margin:12px 0 6px;color:var(--muted)}
+    input,textarea{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,.18);color:var(--text);outline:none}
+    textarea{min-height:110px;resize:vertical}
+    .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    button{cursor:pointer;border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text);padding:10px 12px;border-radius:12px;font-weight:900}
+    button:hover{filter:brightness(1.08)}
+    .primary{background:rgba(90,167,255,.15);border-color:rgba(90,167,255,.35)}
+    .danger{background:rgba(255,90,122,.13);border-color:rgba(255,90,122,.35)}
+    .hidden{display:none!important}
+    .msg{margin-top:12px;padding:12px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.04);font-size:14px;line-height:1.6}
+    .msg.ok{border-color:rgba(90,255,180,.35)}
+    .msg.err{border-color:rgba(255,90,122,.35)}
+    .msg.warn{border-color:rgba(255,211,107,.35)}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .small{font-size:12px;color:var(--muted)}
+    .tableWrap{overflow:auto;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,.12);margin-top:12px}
+    table{width:100%;border-collapse:collapse;min-width:720px}
+    th,td{padding:10px;border-bottom:1px solid var(--border);text-align:right;font-size:13px;vertical-align:middle}
+    th{color:var(--muted);background:rgba(255,255,255,.03);font-weight:900}
+    .thumb{width:44px;height:44px;border-radius:10px;object-fit:cover;border:1px solid var(--border);background:rgba(0,0,0,.2)}
+    .pill{display:inline-flex;padding:4px 10px;border-radius:999px;border:1px solid var(--border);font-weight:900;font-size:12px;opacity:.9}
+    .preview{display:flex;gap:12px;align-items:center;margin-top:12px;padding:10px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.03)}
+    .preview img{width:70px;height:70px;border-radius:12px;object-fit:cover;border:1px solid var(--border);background:rgba(0,0,0,.2)}
+  </style>
+</head>
 
-      * { box-sizing: border-box; }
-      body {
-        margin: 0;
-        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Kufi Arabic", "Noto Sans Arabic", sans-serif;
-        background: radial-gradient(900px 500px at 10% 0%, rgba(90,167,255,0.12), transparent),
-                    radial-gradient(700px 500px at 90% 10%, rgba(255,90,122,0.08), transparent),
-                    var(--bg);
-        color: var(--text);
-      }
-
-      .container { max-width: 1100px; margin: 0 auto; padding: 22px; }
-      .topbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 16px; flex-wrap: wrap; }
-
-      .card {
-        background: rgba(17, 27, 46, 0.92);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        padding: 16px;
-      }
-
-      .grid { display:grid; grid-template-columns: 1fr 1.4fr; gap: 14px; margin-top: 14px; }
-      @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
-
-      label { display:block; font-size: 13px; margin: 12px 0 6px; color: var(--muted); }
-      input, textarea {
-        width:100%;
-        padding: 11px 12px;
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        background: rgba(0,0,0,0.18);
-        color: var(--text);
-        outline: none;
-      }
-      textarea { min-height: 110px; resize: vertical; }
-
-      .btns { display:flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
-      button {
-        cursor:pointer;
-        border: 1px solid var(--border);
-        background: rgba(255,255,255,0.06);
-        color: var(--text);
-        padding: 10px 12px;
-        border-radius: 12px;
-        font-weight: 800;
-      }
-      button:hover { filter: brightness(1.08); }
-      .primary { background: rgba(90,167,255,0.15); border-color: rgba(90,167,255,0.35); }
-      .danger { background: rgba(255,90,122,0.13); border-color: rgba(255,90,122,0.35); }
-
-      .hidden { display:none !important; }
-
-      .msg {
-        margin-top: 12px;
-        padding: 12px;
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        background: rgba(255,255,255,0.04);
-        font-size: 14px;
-        line-height: 1.6;
-      }
-      .msg.ok { border-color: rgba(90,255,180,0.35); }
-      .msg.err { border-color: rgba(255,90,122,0.35); }
-      .msg.warn { border-color: rgba(255,211,107,0.35); }
-
-      .row { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap: wrap; }
-      .small { font-size: 12px; color: var(--muted); }
-
-      .tableWrap {
-        overflow:auto;
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        background: rgba(0,0,0,0.12);
-        margin-top: 12px;
-      }
-      table { width:100%; border-collapse: collapse; min-width: 720px; }
-      th, td {
-        padding: 10px;
-        border-bottom: 1px solid var(--border);
-        text-align: right;
-        font-size: 13px;
-        vertical-align: middle;
-      }
-      th { color: var(--muted); background: rgba(255,255,255,0.03); font-weight: 900; }
-      .thumb { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; border: 1px solid var(--border); background: rgba(0,0,0,0.2); }
-
-      .pill {
-        display:inline-flex;
-        padding: 4px 10px;
-        border-radius: 999px;
-        border: 1px solid var(--border);
-        font-weight: 900;
-        font-size: 12px;
-        opacity: .9;
-      }
-
-      .preview {
-        display:flex;
-        gap: 12px;
-        align-items:center;
-        margin-top: 12px;
-        padding: 10px;
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        background: rgba(255,255,255,0.03);
-      }
-      .preview img {
-        width: 70px;
-        height: 70px;
-        border-radius: 12px;
-        object-fit: cover;
-        border: 1px solid var(--border);
-        background: rgba(0,0,0,0.2);
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="container">
-      <div class="topbar">
-        <div>
-          <div style="font-weight: 900; font-size: 18px;">Suhaib Store — Admin</div>
-          <div class="small">إضافة / تعديل / حذف منتجات + رفع صور (Supabase)</div>
-        </div>
-        <div class="row">
-          <a class="small" href="./index.html" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none;">فتح المتجر ↗</a>
-          <button id="logoutBtn" class="danger hidden" type="button">تسجيل خروج</button>
-        </div>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div>
+        <div style="font-weight:900;font-size:18px;">Suhaib Store — Admin</div>
+        <div class="small">إضافة / تعديل / حذف منتجات + رفع صور</div>
       </div>
-
-      <div id="messageBox" class="msg hidden"></div>
-
-      <!-- Login -->
-      <section id="loginCard" class="card">
-        <h2 style="margin:0; font-size: 16px;">تسجيل دخول Admin</h2>
-
-        <form id="loginForm" style="margin-top: 12px;">
-          <label for="email">الإيميل</label>
-          <input id="email" type="email" required placeholder="admin@email.com" />
-
-          <label for="password">كلمة المرور</label>
-          <input id="password" type="password" required placeholder="••••••••" />
-
-          <div class="btns">
-            <button class="primary" type="submit" id="loginBtn">دخول</button>
-          </div>
-
-          <div class="small" style="margin-top:10px;">
-            إذا ظهر خطأ: تأكد أن المستخدم موجود في Supabase Auth وأن Email Provider مفعل.
-          </div>
-        </form>
-      </section>
-
-      <!-- Panel -->
-      <section id="panel" class="hidden">
-        <div class="grid">
-          <!-- Form -->
-          <div class="card">
-            <div class="row">
-              <div>
-                <h2 style="margin:0; font-size: 16px;">المنتج</h2>
-                <div class="small">الأعمدة المستخدمة: title_ar, desc_ar, price, currency, image_url, featured</div>
-              </div>
-              <div id="userInfo" class="small"></div>
-            </div>
-
-            <form id="productForm" style="margin-top: 10px;">
-              <input id="productId" type="hidden" />
-
-              <label for="title_ar">اسم المنتج (عربي) *</label>
-              <input id="title_ar" type="text" required />
-
-              <label for="desc_ar">وصف المنتج</label>
-              <textarea id="desc_ar"></textarea>
-
-              <label for="price">السعر *</label>
-              <input id="price" type="text" required />
-
-              <label for="currency">العملة</label>
-              <input id="currency" type="text" placeholder="مثال: JOD" value="JOD" />
-
-              <label style="display:flex;align-items:center;gap:10px;margin-top:12px;">
-                <input id="featured" type="checkbox" style="width:18px;height:18px;" />
-                <span>Featured</span>
-              </label>
-
-              <label for="imageFile">صورة المنتج</label>
-              <input id="imageFile" type="file" accept="image/*" />
-
-              <div class="preview">
-                <img id="imagePreview" alt="preview" />
-                <div>
-                  <div style="font-weight:900;">معاينة الصورة</div>
-                  <div id="previewText" class="small">لا توجد صورة</div>
-                </div>
-              </div>
-
-              <div class="btns">
-                <button class="primary" type="submit" id="saveBtn">حفظ</button>
-                <button type="button" id="clearBtn">تفريغ</button>
-              </div>
-            </form>
-          </div>
-
-          <!-- List -->
-          <div class="card">
-            <div class="row">
-              <div>
-                <h2 style="margin:0; font-size: 16px;">المنتجات</h2>
-                <div class="small">عرض مباشر من جدول products</div>
-              </div>
-              <button type="button" id="refreshBtn">تحديث</button>
-            </div>
-
-            <label for="searchInput">بحث بالاسم</label>
-            <input id="searchInput" type="text" placeholder="اكتب جزء من الاسم..." />
-
-            <div class="tableWrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>صورة</th>
-                    <th>الاسم</th>
-                    <th>السعر</th>
-                    <th>Featured</th>
-                    <th>إجراءات</th>
-                  </tr>
-                </thead>
-                <tbody id="tbody"></tbody>
-              </table>
-            </div>
-
-            <div id="countInfo" class="small" style="margin-top:10px;"></div>
-          </div>
-        </div>
-      </section>
+      <div class="row">
+        <a class="small" href="./index.html" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;">فتح المتجر ↗</a>
+        <button id="logoutBtn" class="danger hidden" type="button">تسجيل خروج</button>
+      </div>
     </div>
 
-    <!-- ✅ Supabase UMD -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <div id="messageBox" class="msg hidden"></div>
 
-    <!-- ✅ Config -->
-    <script src="./js/supabase-config.js"></script>
+    <section id="loginCard" class="card">
+      <h2 style="margin:0;font-size:16px;">تسجيل دخول Admin</h2>
 
-    <!-- ✅ Admin JS -->
-    <script src="./js/admin.js"></script>
-  </body>
+      <form id="loginForm" style="margin-top:12px;">
+        <label for="email">الإيميل</label>
+        <input id="email" type="email" required />
+
+        <label for="password">كلمة المرور</label>
+        <input id="password" type="password" required />
+
+        <div class="btns">
+          <button class="primary" type="submit" id="loginBtn">دخول</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="panel" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <div class="row">
+            <div>
+              <h2 style="margin:0;font-size:16px;">المنتج</h2>
+              <div class="small">الأعمدة: title_ar, desc_ar, price, currency, image_url, featured</div>
+            </div>
+            <div id="userInfo" class="small"></div>
+          </div>
+
+          <form id="productForm" style="margin-top:10px;">
+            <input id="productId" type="hidden" />
+
+            <label for="title_ar">اسم المنتج (عربي) *</label>
+            <input id="title_ar" type="text" required />
+
+            <label for="desc_ar">وصف المنتج</label>
+            <textarea id="desc_ar"></textarea>
+
+            <label for="price">السعر *</label>
+            <input id="price" type="text" required />
+
+            <label for="currency">العملة</label>
+            <input id="currency" type="text" value="JOD" />
+
+            <label style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+              <input id="featured" type="checkbox" style="width:18px;height:18px;" />
+              <span>Featured</span>
+            </label>
+
+            <label for="imageFile">صورة المنتج</label>
+            <input id="imageFile" type="file" accept="image/*" />
+
+            <div class="preview">
+              <img id="imagePreview" alt="preview" />
+              <div>
+                <div style="font-weight:900;">معاينة الصورة</div>
+                <div id="previewText" class="small">لا توجد صورة</div>
+              </div>
+            </div>
+
+            <div class="btns">
+              <button class="primary" type="submit" id="saveBtn">حفظ</button>
+              <button type="button" id="clearBtn">تفريغ</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="row">
+            <div>
+              <h2 style="margin:0;font-size:16px;">المنتجات</h2>
+              <div class="small">عرض مباشر من جدول products</div>
+            </div>
+            <button type="button" id="refreshBtn">تحديث</button>
+          </div>
+
+          <label for="searchInput">بحث بالاسم</label>
+          <input id="searchInput" type="text" placeholder="اكتب جزء من الاسم..." />
+
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>صورة</th>
+                  <th>الاسم</th>
+                  <th>السعر</th>
+                  <th>Featured</th>
+                  <th>إجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+
+          <div id="countInfo" class="small" style="margin-top:10px;"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ✅ Supabase UMD -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+  <!-- ✅ Config (في نفس المجلد) -->
+  <script src="./supabase-config.js"></script>
+
+  <!-- ✅ Admin JS (في نفس المجلد) -->
+  <script src="./admin.js"></script>
+</body>
 </html>
+
