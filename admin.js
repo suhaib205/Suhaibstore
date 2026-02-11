@@ -1,232 +1,129 @@
 (() => {
   "use strict";
 
-  // =========================================================
-  // Helpers
-  // =========================================================
-  const $ = (id) => document.getElementById(id);
-
-  function showMessage(text, type = "ok") {
-    const box = $("messageBox");
-    box.className = "msg"; // reset
-    box.classList.remove("hidden");
-    box.textContent = text;
-
-    if (type === "ok") box.classList.add("ok");
-    else if (type === "err") box.classList.add("err");
-    else box.classList.add("warn");
-  }
-
-  function hideMessage() {
-    const box = $("messageBox");
-    box.classList.add("hidden");
-    box.textContent = "";
-  }
-
-  function fmtDate(iso) {
-    if (!iso) return "-";
-    const d = new Date(iso);
-    return d.toLocaleString("ar-JO", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
-
-  function safeStr(v) {
-    return (v ?? "").toString();
-  }
-
-  function pickExt(fileName, fallback = "png") {
-    const parts = safeStr(fileName).split(".");
-    const ext = parts.length > 1 ? parts.pop().toLowerCase() : "";
-    return ext || fallback;
-  }
-
-  function makeFilePath(file) {
-    // مسار نظيف داخل bucket
-    const ext = pickExt(file.name, "png");
-    const rand =
-      (window.crypto && crypto.randomUUID && crypto.randomUUID()) ||
-      `id_${Date.now()}_${Math.random().toString(16).slice(2)}`;
-    return `products/${rand}.${ext}`;
-  }
-
-  // محاولة استخراج path من public URL (للحذف الاختياري)
-  function tryExtractStoragePathFromPublicUrl(imageUrl) {
-    // شكل شائع:
-    // https://XXXX.supabase.co/storage/v1/object/public/product-images/products/abc.png
-    const url = safeStr(imageUrl);
-    const marker = "/storage/v1/object/public/product-images/";
-    const idx = url.indexOf(marker);
-    if (idx === -1) return null;
-    return url.substring(idx + marker.length);
-  }
-
-  // =========================================================
-  // Supabase Client
-  // =========================================================
   const sb = window.sb;
-  if (!sb) {
-    alert("❌ Supabase client غير جاهز. تأكد من supabase-config.js وأنه يشتغل قبل admin.js");
-    return;
+
+  // عناصر
+  const loginCard = document.getElementById("loginCard");
+  const panel = document.getElementById("panel");
+  const messageBox = document.getElementById("messageBox");
+
+  const loginForm = document.getElementById("loginForm");
+  const loginBtn = document.getElementById("loginBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  const userInfo = document.getElementById("userInfo");
+
+  const productForm = document.getElementById("productForm");
+  const productId = document.getElementById("productId");
+  const titleAr = document.getElementById("title_ar");
+  const descAr = document.getElementById("desc_ar");
+  const price = document.getElementById("price");
+  const currency = document.getElementById("currency");
+  const featured = document.getElementById("featured");
+  const imageFile = document.getElementById("imageFile");
+
+  const imagePreview = document.getElementById("imagePreview");
+  const previewText = document.getElementById("previewText");
+
+  const refreshBtn = document.getElementById("refreshBtn");
+  const searchInput = document.getElementById("searchInput");
+  const tbody = document.getElementById("tbody");
+  const countInfo = document.getElementById("countInfo");
+  const clearBtn = document.getElementById("clearBtn");
+  const saveBtn = document.getElementById("saveBtn");
+
+  let allProducts = [];
+  let currentImageUrl = "";
+
+  // Helpers
+  function showMsg(text, type = "ok") {
+    messageBox.className = "msg";
+    messageBox.classList.remove("hidden");
+    messageBox.textContent = text;
+
+    if (type === "ok") messageBox.classList.add("ok");
+    if (type === "err") messageBox.classList.add("err");
+    if (type === "warn") messageBox.classList.add("warn");
   }
 
-  // =========================================================
-  // Elements
-  // =========================================================
-  const authSection = $("authSection");
-  const adminSection = $("adminSection");
+  function hideMsg() {
+    messageBox.classList.add("hidden");
+    messageBox.textContent = "";
+  }
 
-  const loginForm = $("loginForm");
-  const loginBtn = $("loginBtn");
-  const fillDemoBtn = $("fillDemoBtn");
-
-  const logoutBtnTop = $("logoutBtnTop");
-
-  const productForm = $("productForm");
-  const saveBtn = $("saveBtn");
-  const clearBtn = $("clearBtn");
-
-  const refreshBtn = $("refreshBtn");
-  const searchInput = $("searchInput");
-  const productsTbody = $("productsTbody");
-  const countInfo = $("countInfo");
-
-  const productIdEl = $("productId");
-  const titleArEl = $("title_ar");
-  const descArEl = $("desc_ar");
-  const priceEl = $("price");
-  const currencyEl = $("currency");
-  const featuredEl = $("featured");
-  const imageFileEl = $("imageFile");
-
-  const imagePreview = $("imagePreview");
-  const imagePreviewText = $("imagePreviewText");
-  const userInfo = $("userInfo");
-
-  // =========================================================
-  // State
-  // =========================================================
-  let currentUser = null;
-  let allProducts = [];
-  let currentImageUrl = ""; // للصورة الحالية أثناء التعديل
-
-  // =========================================================
-  // UI
-  // =========================================================
-  function setAuthUI(isAuthed) {
+  function setAuthUI(isAuthed, email = "") {
     if (isAuthed) {
-      authSection.classList.add("hidden");
-      adminSection.classList.remove("hidden");
-      logoutBtnTop.classList.remove("hidden");
+      loginCard.classList.add("hidden");
+      panel.classList.remove("hidden");
+      logoutBtn.classList.remove("hidden");
+      userInfo.textContent = email ? `مُسجّل الدخول: ${email}` : "";
     } else {
-      authSection.classList.remove("hidden");
-      adminSection.classList.add("hidden");
-      logoutBtnTop.classList.add("hidden");
+      loginCard.classList.remove("hidden");
+      panel.classList.add("hidden");
+      logoutBtn.classList.add("hidden");
+      userInfo.textContent = "";
       clearForm();
     }
   }
 
+  function clearForm() {
+    productId.value = "";
+    titleAr.value = "";
+    descAr.value = "";
+    price.value = "";
+    currency.value = "JOD";
+    featured.checked = false;
+    imageFile.value = "";
+    currentImageUrl = "";
+    setPreview("");
+    saveBtn.textContent = "حفظ";
+  }
+
   function setPreview(url) {
-    const u = safeStr(url);
-    if (u) {
-      imagePreview.src = u;
+    if (url) {
+      imagePreview.src = url;
       imagePreview.style.display = "block";
-      imagePreviewText.textContent = "سيتم استخدام هذه الصورة (أو اختر صورة جديدة للتبديل).";
+      previewText.textContent = "سيتم استخدام هذه الصورة (أو اختر صورة جديدة)";
     } else {
       imagePreview.removeAttribute("src");
       imagePreview.style.display = "none";
-      imagePreviewText.textContent = "لا توجد صورة حالياً";
+      previewText.textContent = "لا توجد صورة";
     }
   }
 
-  function setBusy(btn, busy, textWhenBusy = "جارٍ التنفيذ...") {
-    btn.disabled = !!busy;
-    btn.dataset._oldText = btn.dataset._oldText || btn.textContent;
-    btn.textContent = busy ? textWhenBusy : btn.dataset._oldText;
+  function makeFilePath(file) {
+    const ext = (file.name.split(".").pop() || "png").toLowerCase();
+    const id = (crypto.randomUUID && crypto.randomUUID()) || ("id_" + Date.now());
+    return `products/${id}.${ext}`;
   }
 
-  // =========================================================
-  // Auth
-  // =========================================================
-  async function refreshSession() {
-    const { data, error } = await sb.auth.getSession();
-    if (error) {
-      showMessage(`❌ خطأ في جلب الجلسة: ${error.message}`, "err");
-      setAuthUI(false);
-      return;
-    }
+  async function uploadImage(file) {
+    const path = makeFilePath(file);
 
-    const session = data?.session || null;
-    currentUser = session?.user || null;
+    const { error: upErr } = await sb.storage
+      .from("product-images")
+      .upload(path, file, { upsert: true, contentType: file.type || "image/*" });
 
-    if (currentUser) {
-      userInfo.textContent = `مُسجّل الدخول: ${safeStr(currentUser.email)}`;
-      setAuthUI(true);
-      await loadProducts();
-    } else {
-      setAuthUI(false);
-    }
+    if (upErr) return { error: upErr, url: "" };
+
+    const { data } = sb.storage.from("product-images").getPublicUrl(path);
+    return { error: null, url: data?.publicUrl || "" };
   }
 
-  async function signIn(email, password) {
-    hideMessage();
-    setBusy(loginBtn, true, "جارٍ تسجيل الدخول...");
-
-    const { data, error } = await sb.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    setBusy(loginBtn, false);
-
-    if (error) {
-      showMessage(`❌ فشل تسجيل الدخول: ${error.message}`, "err");
-      return;
-    }
-
-    currentUser = data?.user || null;
-    showMessage("✅ تم تسجيل الدخول بنجاح", "ok");
-    await refreshSession();
-  }
-
-  async function signOut() {
-    hideMessage();
-    setBusy(logoutBtnTop, true, "جارٍ تسجيل الخروج...");
-
-    const { error } = await sb.auth.signOut();
-
-    setBusy(logoutBtnTop, false);
-
-    if (error) {
-      showMessage(`❌ فشل تسجيل الخروج: ${error.message}`, "err");
-      return;
-    }
-
-    showMessage("✅ تم تسجيل الخروج", "ok");
-    currentUser = null;
-    setAuthUI(false);
-  }
-
-  // =========================================================
-  // DB Operations (products table)
-  // =========================================================
+  // Load products
   async function loadProducts() {
-    hideMessage();
-    productsTbody.innerHTML = "";
-    countInfo.textContent = "جارٍ تحميل المنتجات...";
+    tbody.innerHTML = "";
+    countInfo.textContent = "جارٍ التحميل...";
 
-    // ✅ نختار فقط الأعمدة الموجودة فعلاً
     const { data, error } = await sb
       .from("products")
       .select("id,title_ar,desc_ar,price,currency,image_url,featured,created_at")
       .order("created_at", { ascending: false });
 
     if (error) {
-      showMessage(`❌ خطأ في جلب المنتجات: ${error.message}`, "err");
+      console.error(error);
+      showMsg("❌ خطأ في جلب المنتجات: " + error.message, "err");
       countInfo.textContent = "";
       return;
     }
@@ -235,341 +132,238 @@
     renderProducts(allProducts);
   }
 
-  async function saveProduct(payload, id = null) {
-    // payload يحتوي فقط الأعمدة المطلوبة
-    if (!id) {
-      // Insert
-      const { error } = await sb.from("products").insert([payload]);
-      return { error };
-    } else {
-      // Update
-      const { error } = await sb.from("products").update(payload).eq("id", id);
-      return { error };
-    }
-  }
-
-  async function deleteProduct(product) {
-    const id = product?.id;
-    if (!id) return;
-
-    // (اختياري) محاولة حذف الصورة من الـ bucket إذا قدرنا نستخرج المسار
-    const maybePath = tryExtractStoragePathFromPublicUrl(product.image_url);
-
-    const { error } = await sb.from("products").delete().eq("id", id);
-    if (error) return { error };
-
-    // حذف الصورة (Best-effort)
-    if (maybePath) {
-      try {
-        await sb.storage.from("product-images").remove([maybePath]);
-      } catch (_) {
-        // نتجاهل أي خطأ هنا لأنه اختياري
-      }
-    }
-
-    return { error: null };
-  }
-
-  // =========================================================
-  // Storage (product-images bucket)
-  // =========================================================
-  async function uploadImageIfAny(file) {
-    if (!file) return { imageUrl: "" };
-
-    const path = makeFilePath(file);
-
-    const { error: uploadError } = await sb.storage
-      .from("product-images")
-      .upload(path, file, {
-        cacheControl: "3600",
-        upsert: true,
-        contentType: file.type || "image/*",
-      });
-
-    if (uploadError) {
-      return { error: uploadError, imageUrl: "" };
-    }
-
-    // getPublicUrl يفترض أن الـ bucket public (أو على الأقل القراءة متاحة)
-    const { data } = sb.storage.from("product-images").getPublicUrl(path);
-    const publicUrl = data?.publicUrl || "";
-
-    return { error: null, imageUrl: publicUrl };
-  }
-
-  // =========================================================
-  // Render
-  // =========================================================
   function renderProducts(list) {
-    productsTbody.innerHTML = "";
+    tbody.innerHTML = "";
 
     if (!list.length) {
-      countInfo.textContent = "لا توجد منتجات حالياً.";
+      countInfo.textContent = "لا توجد منتجات.";
       return;
     }
 
     for (const p of list) {
       const tr = document.createElement("tr");
 
-      // image
       const tdImg = document.createElement("td");
       const img = document.createElement("img");
       img.className = "thumb";
-      img.alt = "صورة المنتج";
       img.src = p.image_url || "";
-      if (!p.image_url) {
-        img.style.opacity = "0.35";
-      }
+      img.alt = "img";
       tdImg.appendChild(img);
 
-      // title_ar
       const tdTitle = document.createElement("td");
-      tdTitle.textContent = safeStr(p.title_ar) || "(بدون اسم)";
+      tdTitle.textContent = p.title_ar || "(بدون اسم)";
 
-      // price + currency
       const tdPrice = document.createElement("td");
-      const price = safeStr(p.price);
-      const cur = safeStr(p.currency) || "—";
-      tdPrice.textContent = price ? `${price} ${cur}` : `— ${cur}`;
+      tdPrice.textContent = (p.price || "") + " " + (p.currency || "");
 
-      // featured
-      const tdFeatured = document.createElement("td");
+      const tdFeat = document.createElement("td");
       const pill = document.createElement("span");
-      pill.className = "pill " + (p.featured ? "featured" : "normal");
+      pill.className = "pill";
       pill.textContent = p.featured ? "Featured" : "Normal";
-      tdFeatured.appendChild(pill);
+      tdFeat.appendChild(pill);
 
-      // created_at
-      const tdDate = document.createElement("td");
-      tdDate.textContent = fmtDate(p.created_at);
-
-      // actions
       const tdActions = document.createElement("td");
-      const wrap = document.createElement("div");
-      wrap.className = "actions";
 
       const editBtn = document.createElement("button");
       editBtn.type = "button";
-      editBtn.className = "ghost";
       editBtn.textContent = "تعديل";
-      editBtn.addEventListener("click", () => startEdit(p));
+      editBtn.addEventListener("click", () => {
+        hideMsg();
+        productId.value = p.id;
+        titleAr.value = p.title_ar || "";
+        descAr.value = p.desc_ar || "";
+        price.value = p.price || "";
+        currency.value = p.currency || "JOD";
+        featured.checked = !!p.featured;
+
+        currentImageUrl = p.image_url || "";
+        setPreview(currentImageUrl);
+
+        saveBtn.textContent = "تحديث";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        showMsg("✏️ وضع التعديل: عدّل ثم اضغط تحديث", "warn");
+      });
 
       const delBtn = document.createElement("button");
       delBtn.type = "button";
       delBtn.className = "danger";
       delBtn.textContent = "حذف";
       delBtn.addEventListener("click", async () => {
-        const ok = confirm(`هل أنت متأكد من حذف المنتج: "${safeStr(p.title_ar)}" ؟`);
+        const ok = confirm(`حذف المنتج: ${p.title_ar || ""} ؟`);
         if (!ok) return;
 
-        hideMessage();
-        const { error } = await deleteProduct(p);
+        hideMsg();
+        const { error } = await sb.from("products").delete().eq("id", p.id);
+
         if (error) {
-          showMessage(`❌ فشل الحذف: ${error.message}`, "err");
+          console.error(error);
+          showMsg("❌ فشل الحذف: " + error.message, "err");
           return;
         }
-        showMessage("✅ تم حذف المنتج", "ok");
+
+        showMsg("✅ تم الحذف", "ok");
         await loadProducts();
       });
 
-      wrap.appendChild(editBtn);
-      wrap.appendChild(delBtn);
-      tdActions.appendChild(wrap);
+      tdActions.appendChild(editBtn);
+      tdActions.appendChild(delBtn);
 
       tr.appendChild(tdImg);
       tr.appendChild(tdTitle);
       tr.appendChild(tdPrice);
-      tr.appendChild(tdFeatured);
-      tr.appendChild(tdDate);
+      tr.appendChild(tdFeat);
       tr.appendChild(tdActions);
 
-      productsTbody.appendChild(tr);
+      tbody.appendChild(tr);
     }
 
-    countInfo.textContent = `عدد المنتجات: ${list.length}`;
+    countInfo.textContent = "عدد المنتجات: " + list.length;
   }
 
-  function applySearchFilter() {
-    const q = safeStr(searchInput.value).trim().toLowerCase();
-    if (!q) {
-      renderProducts(allProducts);
-      return;
-    }
-    const filtered = allProducts.filter((p) =>
-      safeStr(p.title_ar).toLowerCase().includes(q)
-    );
-    renderProducts(filtered);
+  function applySearch() {
+    const q = (searchInput.value || "").trim().toLowerCase();
+    if (!q) return renderProducts(allProducts);
+    renderProducts(allProducts.filter(p => (p.title_ar || "").toLowerCase().includes(q)));
   }
 
-  // =========================================================
-  // Form
-  // =========================================================
-  function clearForm() {
-    productIdEl.value = "";
-    titleArEl.value = "";
-    descArEl.value = "";
-    priceEl.value = "";
-    currencyEl.value = "JOD";
-    featuredEl.checked = false;
-    imageFileEl.value = "";
-    currentImageUrl = "";
-    setPreview("");
-    saveBtn.dataset._oldText = "حفظ المنتج";
-    saveBtn.textContent = "حفظ المنتج";
-  }
-
-  function startEdit(product) {
-    productIdEl.value = product.id;
-    titleArEl.value = safeStr(product.title_ar);
-    descArEl.value = safeStr(product.desc_ar);
-    priceEl.value = safeStr(product.price);
-    currencyEl.value = safeStr(product.currency) || "JOD";
-    featuredEl.checked = !!product.featured;
-
-    currentImageUrl = safeStr(product.image_url);
-    setPreview(currentImageUrl);
-
-    saveBtn.dataset._oldText = "تحديث المنتج";
-    saveBtn.textContent = "تحديث المنتج";
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    showMessage("✏️ وضع التعديل مفعل — عدّل البيانات ثم اضغط تحديث المنتج", "warn");
-  }
-
-  // معاينة الصورة قبل الرفع
-  imageFileEl.addEventListener("change", () => {
-    const file = imageFileEl.files?.[0];
+  // Events
+  imageFile.addEventListener("change", () => {
+    const file = imageFile.files && imageFile.files[0];
     if (!file) {
       setPreview(currentImageUrl);
       return;
     }
     const url = URL.createObjectURL(file);
     setPreview(url);
-    imagePreviewText.textContent = "هذه معاينة محلية (سيتم رفع الملف عند الحفظ).";
+    previewText.textContent = "معاينة محلية (سيتم رفع الصورة عند الحفظ)";
   });
 
-  // =========================================================
-  // Events
-  // =========================================================
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = safeStr($("email").value).trim();
-    const password = safeStr($("password").value);
+    hideMsg();
 
-    if (!email || !password) {
-      showMessage("⚠️ الرجاء إدخال الإيميل وكلمة المرور", "warn");
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    loginBtn.disabled = true;
+    loginBtn.textContent = "جارٍ الدخول...";
+
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+    loginBtn.disabled = false;
+    loginBtn.textContent = "دخول";
+
+    if (error) {
+      console.error(error);
+      showMsg("❌ فشل تسجيل الدخول: " + error.message, "err");
       return;
     }
-    await signIn(email, password);
+
+    showMsg("✅ تم تسجيل الدخول", "ok");
+    setAuthUI(true, data.user?.email || "");
+    await loadProducts();
   });
 
-  fillDemoBtn.addEventListener("click", () => {
-    $("email").value = "admin@email.com";
-    $("password").value = "password";
-    showMessage("✳️ تم تعبئة بيانات تجريبية (غيّرها لبياناتك الحقيقية)", "warn");
-  });
-
-  logoutBtnTop.addEventListener("click", signOut);
-
-  clearBtn.addEventListener("click", () => {
-    hideMessage();
-    clearForm();
-    showMessage("✅ تم تفريغ النموذج", "ok");
+  logoutBtn.addEventListener("click", async () => {
+    hideMsg();
+    const { error } = await sb.auth.signOut();
+    if (error) {
+      console.error(error);
+      showMsg("❌ فشل تسجيل الخروج: " + error.message, "err");
+      return;
+    }
+    showMsg("✅ تم تسجيل الخروج", "ok");
+    setAuthUI(false);
   });
 
   refreshBtn.addEventListener("click", async () => {
-    hideMessage();
+    hideMsg();
     await loadProducts();
-    showMessage("✅ تم التحديث", "ok");
+    showMsg("✅ تم التحديث", "ok");
   });
 
-  searchInput.addEventListener("input", applySearchFilter);
+  searchInput.addEventListener("input", applySearch);
+
+  clearBtn.addEventListener("click", () => {
+    hideMsg();
+    clearForm();
+    showMsg("✅ تم تفريغ النموذج", "ok");
+  });
 
   productForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    hideMessage();
+    hideMsg();
 
-    if (!currentUser) {
-      showMessage("❌ يجب تسجيل الدخول أولاً", "err");
-      return;
-    }
+    saveBtn.disabled = true;
+    saveBtn.textContent = "جارٍ الحفظ...";
 
-    const id = safeStr(productIdEl.value).trim() || null;
-    const title_ar = safeStr(titleArEl.value).trim();
-    const desc_ar = safeStr(descArEl.value).trim();
-    const price = safeStr(priceEl.value).trim();
-    const currency = safeStr(currencyEl.value).trim() || "JOD";
-    const featured = !!featuredEl.checked;
+    const id = productId.value.trim() || null;
 
-    if (!title_ar || !price) {
-      showMessage("⚠️ الاسم والسعر مطلوبين", "warn");
-      return;
-    }
-
-    setBusy(saveBtn, true, "جارٍ الحفظ...");
-
-    // رفع صورة (إن وجدت)
-    const file = imageFileEl.files?.[0] || null;
-    let image_url = currentImageUrl; // الافتراضي: احتفظ بالصورة الحالية
-    if (file) {
-      const up = await uploadImageIfAny(file);
-      if (up.error) {
-        setBusy(saveBtn, false);
-        showMessage(`❌ فشل رفع الصورة: ${up.error.message}`, "err");
-        return;
-      }
-      image_url = up.imageUrl;
-    }
-
-    // ✅ payload مطابق للأعمدة المطلوبة فقط
     const payload = {
-      title_ar,
-      desc_ar,
-      price,
-      currency,
-      image_url,
-      featured,
+      title_ar: titleAr.value.trim(),
+      desc_ar: descAr.value.trim(),
+      price: price.value.trim(),
+      currency: currency.value.trim() || "JOD",
+      featured: !!featured.checked,
+      image_url: currentImageUrl || "",
     };
 
-    const { error } = await saveProduct(payload, id);
+    // ✅ رفع صورة إن وجدت
+    const file = imageFile.files && imageFile.files[0];
+    if (file) {
+      const up = await uploadImage(file);
+      if (up.error) {
+        console.error(up.error);
+        saveBtn.disabled = false;
+        saveBtn.textContent = id ? "تحديث" : "حفظ";
+        showMsg("❌ فشل رفع الصورة: " + up.error.message, "err");
+        return;
+      }
+      payload.image_url = up.url;
+    }
 
-    setBusy(saveBtn, false);
+    // ✅ Insert أو Update
+    let error = null;
+    if (!id) {
+      const res = await sb.from("products").insert([payload]);
+      error = res.error;
+    } else {
+      const res = await sb.from("products").update(payload).eq("id", id);
+      error = res.error;
+    }
+
+    saveBtn.disabled = false;
+    saveBtn.textContent = id ? "تحديث" : "حفظ";
 
     if (error) {
-      showMessage(`❌ فشل الحفظ: ${error.message}`, "err");
+      console.error(error);
+      showMsg("❌ فشل الحفظ: " + error.message, "err");
       return;
     }
 
-    showMessage(id ? "✅ تم تحديث المنتج" : "✅ تم إضافة المنتج", "ok");
+    showMsg(id ? "✅ تم تحديث المنتج" : "✅ تم إضافة المنتج", "ok");
     clearForm();
     await loadProducts();
   });
 
-  // =========================================================
   // Init
-  // =========================================================
-  async function init() {
-    // Listener لأي تغيير بالجلسة (تسجيل دخول/خروج)
-    sb.auth.onAuthStateChange(async (_event, session) => {
-      currentUser = session?.user || null;
-      if (currentUser) {
-        userInfo.textContent = `مُسجّل الدخول: ${safeStr(currentUser.email)}`;
-        setAuthUI(true);
-        await loadProducts();
-      } else {
-        setAuthUI(false);
-      }
-    });
+  (async () => {
+    if (!sb) {
+      alert("❌ Supabase غير جاهز. تأكد من supabase-config.js");
+      return;
+    }
 
-    // جلسة أول ما الصفحة تفتح
-    await refreshSession();
+    const { data } = await sb.auth.getSession();
+    const session = data?.session;
 
-    // preview start
+    if (session?.user) {
+      setAuthUI(true, session.user.email || "");
+      await loadProducts();
+    } else {
+      setAuthUI(false);
+    }
+
     setPreview("");
-  }
-
-  init().catch((err) => {
-    console.error(err);
-    showMessage(`❌ خطأ غير متوقع: ${err.message || err}`, "err");
-  });
+  })();
 })();
+
