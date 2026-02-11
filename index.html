@@ -1,177 +1,199 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Suhaib Store</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Suhaib Store</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: #f5f6fa;
-      color: #111;
-    }
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Kufi Arabic", "Noto Sans Arabic", sans-serif;
+        background: #f6f7fb;
+        color: #111;
+      }
 
-    header {
-      background: #fff;
-      border-bottom: 1px solid #e5e5e5;
-    }
+      header {
+        background: #fff;
+        border-bottom: 1px solid #e8e8e8;
+      }
 
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 20px;
-    }
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 18px;
+      }
 
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
 
-    h1 {
-      margin: 0;
-      font-size: 20px;
-    }
+      .title {
+        margin: 0;
+        font-size: 20px;
+      }
 
-    .admin-link {
-      padding: 8px 12px;
-      border-radius: 10px;
-      border: 1px solid #ddd;
-      background: #fff;
-      text-decoration: none;
-      font-weight: bold;
-      color: #111;
-    }
+      .subtitle {
+        margin: 6px 0 0;
+        opacity: 0.7;
+        font-size: 13px;
+      }
 
-    .admin-link:hover {
-      background: #f0f0f0;
-    }
+      .adminLink {
+        display: inline-block;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid #e8e8e8;
+        background: #fff;
+        color: #111;
+        text-decoration: none;
+        font-weight: 800;
+      }
 
-    #productsGrid {
-      margin-top: 20px;
-      display: grid;
-      gap: 15px;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    }
+      .adminLink:hover {
+        filter: brightness(0.97);
+      }
 
-    .card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 12px;
-      border: 1px solid rgba(0,0,0,0.08);
-    }
+      #productsGrid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        margin-top: 16px;
+      }
 
-    .card img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      border-radius: 10px;
-      background: #eee;
-    }
+      .card {
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 14px;
+        padding: 12px;
+      }
 
-    .card h3 {
-      margin: 10px 0 6px;
-      font-size: 16px;
-    }
+      .card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        border-radius: 12px;
+        background: #f2f2f2;
+        border: 1px solid rgba(0,0,0,0.06);
+      }
 
-    .card p {
-      margin: 0 0 8px;
-      font-size: 13px;
-      opacity: 0.7;
-      line-height: 1.5;
-    }
+      .card h3 {
+        margin: 10px 0 6px;
+        font-size: 16px;
+      }
 
-    .price {
-      font-weight: bold;
-      font-size: 14px;
-    }
-  </style>
-</head>
+      .card p {
+        margin: 0 0 10px;
+        font-size: 13px;
+        line-height: 1.6;
+        opacity: 0.75;
+      }
 
-<body>
+      .price {
+        font-weight: 900;
+        font-size: 14px;
+      }
 
-<header>
-  <div class="container">
-    <div class="topbar">
-      <h1>Suhaib Store</h1>
-      <a class="admin-link" href="admin.html">لوحة الإدارة</a>
-    </div>
-  </div>
-</header>
+      .msg {
+        margin-top: 14px;
+        padding: 12px;
+        border-radius: 12px;
+        background: #fff;
+        border: 1px solid #e8e8e8;
+        font-size: 14px;
+      }
+    </style>
+  </head>
 
-<main class="container">
-  <div id="productsGrid">جارٍ تحميل المنتجات...</div>
-</main>
+  <body>
+    <header>
+      <div class="container">
+        <div class="topbar">
+          <div>
+            <h1 class="title">Suhaib Store</h1>
+            <p class="subtitle">عرض المنتجات من Supabase</p>
+          </div>
+          <a class="adminLink" href="./admin.html">لوحة الإدارة</a>
+        </div>
+      </div>
+    </header>
 
-<!-- ✅ Supabase Library -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <main class="container">
+      <div id="status" class="msg">جارٍ تحميل المنتجات...</div>
+      <div id="productsGrid"></div>
+    </main>
 
-<script>
-  // 🔴 ضع بيانات مشروعك هنا
-  const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co";
-  const SUPABASE_ANON_KEY = "YOUR_ANON_PUBLIC_KEY";
+    <!-- ✅ Supabase UMD (مهم جداً) -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    <!-- ✅ Config -->
+    <script src="./js/supabase-config.js"></script>
 
-  const grid = document.getElementById("productsGrid");
+    <!-- ✅ Load products (بدون index.js) -->
+    <script>
+      (async () => {
+        const statusEl = document.getElementById("status");
+        const grid = document.getElementById("productsGrid");
 
-  function createCard(product) {
-    const div = document.createElement("div");
-    div.className = "card";
+        if (!window.sb) {
+          statusEl.textContent = "❌ خطأ: Supabase غير جاهز";
+          return;
+        }
 
-    const img = document.createElement("img");
-    img.src = product.image_url || "";
-    img.alt = product.title_ar || "Product";
+        function card(p) {
+          const wrap = document.createElement("div");
+          wrap.className = "card";
 
-    const title = document.createElement("h3");
-    title.textContent = product.title_ar || "(بدون اسم)";
+          const img = document.createElement("img");
+          img.src = p.image_url || "";
+          img.alt = p.title_ar || "Product";
 
-    const desc = document.createElement("p");
-    desc.textContent = product.desc_ar || "";
+          const title = document.createElement("h3");
+          title.textContent = p.title_ar || "(بدون اسم)";
 
-    const price = document.createElement("div");
-    price.className = "price";
-    const currency = product.currency || "";
-    price.textContent = product.price ? product.price + " " + currency : "";
+          const desc = document.createElement("p");
+          desc.textContent = p.desc_ar || "";
 
-    div.appendChild(img);
-    div.appendChild(title);
-    div.appendChild(desc);
-    div.appendChild(price);
+          const price = document.createElement("div");
+          price.className = "price";
+          const cur = p.currency || "";
+          price.textContent = p.price ? (p.price + " " + cur) : "";
 
-    return div;
-  }
+          wrap.appendChild(img);
+          wrap.appendChild(title);
+          wrap.appendChild(desc);
+          wrap.appendChild(price);
 
-  async function loadProducts() {
-    const { data, error } = await sb
-      .from("products")
-      .select("id,title_ar,desc_ar,price,currency,image_url,featured,created_at")
-      .order("created_at", { ascending: false });
+          return wrap;
+        }
 
-    if (error) {
-      console.error(error);
-      grid.textContent = "حدث خطأ أثناء تحميل المنتجات";
-      return;
-    }
+        const { data, error } = await window.sb
+          .from("products")
+          .select("id,title_ar,desc_ar,price,currency,image_url,featured,created_at")
+          .order("created_at", { ascending: false });
 
-    grid.innerHTML = "";
+        if (error) {
+          console.error(error);
+          statusEl.textContent = "❌ حدث خطأ أثناء تحميل المنتجات";
+          return;
+        }
 
-    if (!data || data.length === 0) {
-      grid.textContent = "لا توجد منتجات حالياً.";
-      return;
-    }
+        statusEl.textContent = "";
+        grid.innerHTML = "";
 
-    data.forEach(product => {
-      grid.appendChild(createCard(product));
-    });
-  }
+        if (!data || data.length === 0) {
+          statusEl.textContent = "لا توجد منتجات حالياً.";
+          return;
+        }
 
-  loadProducts();
-</script>
-
-</body>
+        for (const p of data) {
+          grid.appendChild(card(p));
+        }
+      })();
+    </script>
+  </body>
 </html>
